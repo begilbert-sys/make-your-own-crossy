@@ -1,0 +1,27 @@
+.square {
+	border: 1px solid #999;
+	font-size: 80px;
+	font-weight: bold;
+	height: 100px;
+	margin-right: -1px;
+	margin-top: -1px;
+	padding: 0;
+	width: 100px;
+	display:inline-flex;
+	justify-content: center;
+	align-items:flex-end;
+	text-transform: uppercase;
+	text-align: center;
+	caret-color: transparent;
+}
+
+.square:focus {
+	background-color: white !important;
+}
+
+.cornerValue {
+	position: absolute;
+	font-size: 22px;
+	top:5px;
+	left:10px;
+}
