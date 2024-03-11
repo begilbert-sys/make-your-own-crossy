@@ -14,9 +14,8 @@
 	text-align: center;
 	caret-color: transparent;
 }
-
 .square:focus {
-	background-color: white !important;
+	outline: none;
 }
 
 .cornerValue {
