@@ -2,10 +2,10 @@ import { KeyboardEvent, useState, useRef, createContext, useContext } from 'reac
 import styles from '@/styles/Home.module.css';
 import clsx from 'clsx';
 
-import {IBoardContext, direction, coordinate, dimensions} from '@/app/components/types';
+import {direction, coordinate, dimensions} from '@/app/components/types';
+import {BoardContext, IBoardContext} from '@/app/components/boardcontext';
 
 
-export const BoardContext = createContext<IBoardContext>({board: [[]], setBoard: (s: string[][]) => {}});
 
 interface ISquareProps {
     coords: coordinate,
@@ -32,14 +32,23 @@ function getNextSquare(coords: coordinate, boardDimensions: dimensions, focus: c
         return coords.row === boardDimensions.rows - 1 ? new coordinate(0, coords.column + 1) : new coordinate(coords.row + 1, coords.column);
     }
 }
+function getPrevSquare(coords: coordinate, boardDimensions: dimensions, focus: coordinate, focusDirection: direction): coordinate {
+    if (coords.row === 0 && coords.column === 0) {
+        return coords;
+    }
+    if (focusDirection === "horizontal") {
+        return coords.column === 0 ? new coordinate(coords.row - 1, boardDimensions.columns - 1) : new coordinate(coords.row, coords.column - 1);
+    } else {
+        return coords.row === 0 ? new coordinate(boardDimensions.rows - 1, coords.column - 1) : new coordinate(coords.row - 1, coords.column);
+    }
+}
 
 function prevSquare(props: ISquareProps): coordinate {
     return props.coords;
 }
 
-export default function Square({coords, boardDimensions, focus, setFocus, focusDirection, setFocusDirection} : ISquareProps) {
+export default function Square({coords, boardDimensions, focus, setFocus, focusDirection, setFocusDirection, cornerValue} : ISquareProps) {
     const {board, setBoard} = useContext<IBoardContext>(BoardContext);
-    
     const char = board[coords.row][coords.column];
     const setChar = (newChar: string) => {
         var newBoard = board.map(arr => [...arr]);
@@ -66,7 +75,7 @@ export default function Square({coords, boardDimensions, focus, setFocus, focusD
         }
         else if (e.key === "Backspace") {
             setChar(' ');
-            setFocus(coords);
+            setFocus(getPrevSquare(coords, boardDimensions, focus, focusDirection));
         }
     }
     const handleClick = () => {
@@ -76,15 +85,18 @@ export default function Square({coords, boardDimensions, focus, setFocus, focusD
         setFocus(coords);
     }
     return (
-    <input 
-        ref = {inputRef}
-        type = "text"
-        value = {char}
-        maxLength = {1}
-        className = {classList} 
-        onKeyDown = {handleKeyPress}
-        onClick = {handleClick}
-        onChange = {(e) => {}} // onChange is required but it does nothing
-    />
+    <div>
+        <div className = {styles.cornerValue}>{cornerValue}</div>
+        <input 
+            ref = {inputRef}
+            type = "text"
+            value = {char}
+            maxLength = {1}
+            className = {classList} 
+            onKeyDown = {handleKeyPress}
+            onClick = {handleClick}
+            onChange = {(e) => {}} // onChange is required but it does nothing
+        />
+    </div>
     )
 }

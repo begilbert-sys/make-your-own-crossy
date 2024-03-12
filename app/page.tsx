@@ -1,13 +1,14 @@
 import Image from "next/image";
-import Board from "@/app/components/board";
 import { StrictMode } from 'react';
+import CrossyBuilder from "@/app/components/crossybuilder";
+import styles from '@/styles/Home.module.css';
 
 export default function Home() {
 	return (
-	<div>
-		<StrictMode>
-			<Board rows={4} columns={4} />
-		</StrictMode>
-	</div>
+	<StrictMode>
+		<div>
+			<CrossyBuilder />
+		</div>
+	</StrictMode>
 	);
 }
