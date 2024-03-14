@@ -1,33 +1,38 @@
 'use client';
-import { useState, useContext } from 'react';
+import RefObject, { useState, useEffect, useRef } from 'react';
 import Square from '@/app/components/square';
+import {direction, coordinate, dimensions, NO_FOCUS} from '@/app/components/types';
 
-import {direction, coordinate, dimensions} from '@/app/components/types';
-import {BoardContext, IBoardContext} from '@/app/components/boardcontext';
-
-function getAcrossList(board: string[][], {rows, columns} : dimensions): coordinate[] {
-    /* Get a list of all coordinates that should be marked with a horizontal ("across") corner value */
-    let acrossList = [];
-    for (let row = 0; row < rows; row++) {
-        for (let col = 0; col < columns; col++) {
-            if (board[row][col] !== ' ' && (col === 0 || board[row][col-1] === ' ')) {
-                acrossList.push(new coordinate(row, col));
+interface IBoardProps {
+    dimensions: dimensions,
+    acrossList: coordinate[],
+    downList: coordinate[]
+}
+function outsideClickListener(ref: RefObject.RefObject<HTMLDivElement>, setFocus: (c: coordinate) => void) {
+    /*
+    This de-focuses any selected square when the user clicks anywhere outside of the board
+    */
+    useEffect(() => {
+        function handleClickOutside(event: globalThis.MouseEvent) {
+            if (ref.current && !ref.current.contains(event.target as Node)) {
+                setFocus(NO_FOCUS);
             }
         }
-    }
-    // array is reversed to make it equivalent to a stack 
-    return acrossList.reverse();
+        document.addEventListener("mousedown", handleClickOutside);
+        return () => {
+            document.removeEventListener("mousedown", handleClickOutside);
+        };
+    }, [ref]);
 }
-
-export default function Board({rows, columns} : dimensions) {
-    const {board, setBoard} = useContext<IBoardContext>(BoardContext);
-    const [focus, setFocus] = useState<coordinate>(new coordinate(0, 0));
+export default function Board({dimensions: {rows, columns}, acrossList, downList} : IBoardProps) {
+    const [focus, setFocus] = useState<coordinate>(NO_FOCUS);
     const [focusDirection, setFocusDirection] = useState<direction>("horizontal");
-
-
-    const acrossList = getAcrossList(board, {rows, columns});
+    const clickWrapperRef = useRef<HTMLDivElement>(null);
+    outsideClickListener(clickWrapperRef, setFocus);
 
     const boardArray = [];
+    acrossList = [...acrossList].reverse();
+    downList = [...downList].reverse();
     let cornerValue = 0;
     for (let row = 0; row < rows; row++){
         let rowArray = []
@@ -37,8 +42,15 @@ export default function Board({rows, columns} : dimensions) {
             let hasCornerValue = false;
             if (acrossList.length > 0 && coords.equals(acrossList[acrossList.length - 1])) {
                 hasCornerValue = true;
-                acrossList.pop();
                 cornerValue++;
+                acrossList.pop();
+            }
+            if (downList.length > 0 && coords.equals(downList[downList.length - 1])) {
+                if (!hasCornerValue) {
+                    hasCornerValue = true;
+                    cornerValue++;
+                }
+                downList.pop();
             }
             rowArray.push(
                 <Square 
@@ -60,7 +72,7 @@ export default function Board({rows, columns} : dimensions) {
         )
     }
     return (
-        <div>
+        <div ref={clickWrapperRef}>
             {boardArray}
         </div>
     );
