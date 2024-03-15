@@ -2,52 +2,45 @@ import { KeyboardEvent, useState, useRef, createContext, useContext } from 'reac
 import styles from '@/styles/Home.module.css';
 import clsx from 'clsx';
 
-import {direction, coordinate, dimensions} from '@/app/components/types';
+import {dimensions, Selection, Coordinate} from '@/app/components/types';
+import {SelectionContext, ISelectionContext} from '@/app/components/selectioncontext';
 import {BoardContext, IBoardContext} from '@/app/components/boardcontext';
 
 
-
-interface ISquareProps {
-    coords: coordinate,
-    boardDimensions: dimensions,
-    focus: coordinate,
-    setFocus: (f: coordinate) => void,
-    focusDirection: direction
-    setFocusDirection: (d: direction) => void
-    cornerValue?: number,
-}
-
-function isHighlighted(coords: coordinate, focus: coordinate, focusDirection: direction): boolean {
-    return focusDirection === "horizontal" ? coords.row === focus.row : coords.column === focus.column;
-}
-
-function getNextSquare(coords: coordinate, boardDimensions: dimensions, focus: coordinate, focusDirection: direction): coordinate {
+function getNextSquare(coords: Coordinate, boardDimensions: dimensions, selection: Selection): Coordinate {
+    const focusDirection = selection.direction;
     // don't go anywhere if it's the last square on the board 
     if (coords.row === boardDimensions.rows - 1 && coords.column === boardDimensions.columns - 1) {
         return coords;
     }
     if (focusDirection === "horizontal") {
-        return coords.column === boardDimensions.columns - 1 ? new coordinate(coords.row + 1, 0) : new coordinate(coords.row, coords.column + 1);
+        return coords.column === boardDimensions.columns - 1 ? new Coordinate(coords.row + 1, 0) : new Coordinate(coords.row, coords.column + 1);
     } else {
-        return coords.row === boardDimensions.rows - 1 ? new coordinate(0, coords.column + 1) : new coordinate(coords.row + 1, coords.column);
+        return coords.row === boardDimensions.rows - 1 ? new Coordinate(0, coords.column + 1) : new Coordinate(coords.row + 1, coords.column);
     }
 }
-function getPrevSquare(coords: coordinate, boardDimensions: dimensions, focus: coordinate, focusDirection: direction): coordinate {
+function getPrevSquare(coords: Coordinate, boardDimensions: dimensions, selection: Selection): Coordinate {
+    const focusDirection = selection.direction;
+    // don't go anywhere if it's the last square on the board 
     if (coords.row === 0 && coords.column === 0) {
         return coords;
     }
     if (focusDirection === "horizontal") {
-        return coords.column === 0 ? new coordinate(coords.row - 1, boardDimensions.columns - 1) : new coordinate(coords.row, coords.column - 1);
+        return coords.column === 0 ? new Coordinate(coords.row - 1, boardDimensions.columns - 1) : new Coordinate(coords.row, coords.column - 1);
     } else {
-        return coords.row === 0 ? new coordinate(boardDimensions.rows - 1, coords.column - 1) : new coordinate(coords.row - 1, coords.column);
+        return coords.row === 0 ? new Coordinate(boardDimensions.rows - 1, coords.column - 1) : new Coordinate(coords.row - 1, coords.column);
     }
 }
 
-function prevSquare(props: ISquareProps): coordinate {
-    return props.coords;
+interface ISquareProps {
+    coords: Coordinate,
+    boardDimensions: dimensions,
+    highlighted: boolean,
+    nextWord?: Coordinate,
+    cornerValue?: number,
 }
-
-export default function Square({coords, boardDimensions, focus, setFocus, focusDirection, setFocusDirection, cornerValue} : ISquareProps) {
+export default function Square({coords, boardDimensions, highlighted, nextWord, cornerValue} : ISquareProps) {
+    const {selection, setSelection} = useContext<ISelectionContext>(SelectionContext);
     const {board, setBoard} = useContext<IBoardContext>(BoardContext);
     const char = board[coords.row][coords.column];
     const setChar = (newChar: string) => {
@@ -57,32 +50,90 @@ export default function Square({coords, boardDimensions, focus, setFocus, focusD
     };
 
     const inputRef = useRef<HTMLInputElement>(null);
-    if (inputRef.current != null && coords.equals(focus)) {
+    if (inputRef.current != null && selection.focus && coords.equals(selection.coordinate)) {
         inputRef.current.focus();
     }
 
     const classList = clsx(
         styles.square,
-        {"bg-square-lightblue": !coords.equals(focus) && isHighlighted(coords, focus, focusDirection)},
+        {"bg-square-lightblue": highlighted},
         {"bg-black": char === ' '},
-        {"bg-square-yellow": coords.equals(focus)}
+        {"!bg-square-yellow": coords.equals(selection.coordinate) && selection.focus } 
     );
 
     const handleKeyPress = (e: KeyboardEvent) => {
-        if (e.key.length === 1 && e.key.match(/[a-zA-Z]/)) {
-            setChar(e.key);
-            setFocus(getNextSquare(coords, boardDimensions, focus, focusDirection));
+        /* handle different keypresses */
+        let modifiedSelection = { ...selection};
+        switch (e.key) {
+            case "Backspace":
+                /* delete square value and move one square back */
+                setChar(' ');
+                modifiedSelection.coordinate = getPrevSquare(coords, boardDimensions, selection);
+                break;
+
+            case "Enter":
+                /* jump to the next word */
+                if (nextWord) {
+                    modifiedSelection.coordinate = nextWord;
+                }
+                break;
+
+            case "ArrowUp":
+                /* switch direction to up or move up one square */
+                if (modifiedSelection.direction === "horizontal") {
+                    modifiedSelection.direction = "vertical"
+                } 
+                else if (selection.coordinate.row !== 0) {
+                    modifiedSelection.coordinate = new Coordinate(selection.coordinate.row - 1, selection.coordinate.column);
+                }
+                break;
+
+            case "ArrowDown":
+                if (modifiedSelection.direction === "horizontal") {
+                    modifiedSelection.direction = "vertical"
+                } 
+                else if (selection.coordinate.row !== boardDimensions.rows - 1) {
+                    modifiedSelection.coordinate = new Coordinate(selection.coordinate.row  + 1, selection.coordinate.column);
+                }
+                break;
+
+            case "ArrowRight":
+                if (modifiedSelection.direction === "vertical") {
+                    modifiedSelection.direction = "horizontal"
+                } 
+                else if (selection.coordinate.column !== boardDimensions.columns - 1) {
+                    modifiedSelection.coordinate = new Coordinate(selection.coordinate.row, selection.coordinate.column + 1);
+                }
+                break;
+
+            case "ArrowLeft":
+                if (modifiedSelection.direction === "vertical") {
+                    modifiedSelection.direction = "horizontal"
+                } 
+                else if (selection.coordinate.column !== 0) {
+                    modifiedSelection.coordinate = new Coordinate(selection.coordinate.row, selection.coordinate.column - 1);
+                }
+                break;
+
+            default:
+                /* if the keypress was a letter, assign the square to that letter */
+                if (e.key.length === 1 && e.key.match(/[a-zA-Z]/)) {
+                    setChar(e.key);
+                    modifiedSelection.coordinate = getNextSquare(coords, boardDimensions, selection);
+                }
         }
-        else if (e.key === "Backspace") {
-            setChar(' ');
-            setFocus(getPrevSquare(coords, boardDimensions, focus, focusDirection));
-        }
+        setSelection(modifiedSelection);
     }
+
     const handleClick = () => {
-        if (focus.equals(coords)) {
-            setFocusDirection(focusDirection === "horizontal" ? "vertical" : "horizontal");
+        /* focus the square. if the square is already focused, swap the direction */
+        let modifiedSelection = { ...selection };
+        if (coords.equals(selection.coordinate)) {
+            modifiedSelection.direction = (selection.direction === "horizontal" ? "vertical" : "horizontal")
         }
-        setFocus(coords);
+        modifiedSelection.coordinate = coords;
+        modifiedSelection.focus = true;
+        setSelection(modifiedSelection);
     }
     return (
     <div>
