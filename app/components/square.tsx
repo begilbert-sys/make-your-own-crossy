@@ -58,7 +58,7 @@ export default function Square({coords, boardDimensions, highlighted, nextWord, 
         styles.square,
         {"bg-square-lightblue": highlighted},
         {"bg-black": char === ' '},
-        {"!bg-square-yellow": coords.equals(selection.coordinate) && selection.focus } 
+        {"!bg-square-yellow": coords.equals(selection.coordinate) && selection.focus} 
     );
 
     const handleKeyPress = (e: KeyboardEvent) => {

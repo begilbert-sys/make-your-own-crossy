@@ -1,16 +1,16 @@
 import {useContext} from 'react';
-import {Coordinate, wordselection} from '@/app/components/types';
+import {Coordinate} from '@/app/components/types';
 import {SelectionContext, ISelectionContext} from '@/app/components/selectioncontext';
 interface ICluesProps {
     title: string,
     items: Coordinate[],
 }
-export default function clues({title, items}: ICluesProps) {
+export default function Clues({title, items}: ICluesProps) {
     const {selection, setSelection} = useContext<ISelectionContext>(SelectionContext);
     const reFocus = (index: number) => {
         setSelection({
             coordinate: items[index],
-            direction: selection.direction,
+            direction: title === "ACROSS" ? "horizontal" : "vertical",
             focus: false
         });
 
