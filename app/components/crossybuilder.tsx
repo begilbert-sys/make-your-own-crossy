@@ -101,13 +101,9 @@ export default function CrossyBuilder() {
                 </BoardContext.Provider>
                 
                 <Clues
-                title = "ACROSS" 
-                items = {acrossList} 
-                />
-
-                <Clues
-                title = "DOWN" 
-                items = {downList} 
+                boardDimensions = {dimensions}
+                acrossList = {acrossList} 
+                downList = {downList}
                 />
             </SelectionContext.Provider>
         </div>

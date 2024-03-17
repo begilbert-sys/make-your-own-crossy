@@ -5,11 +5,6 @@ import {dimensions, Coordinate, Selection, NO_SELECTION} from '@/app/components/
 import {SelectionContext, ISelectionContext} from '@/app/components/selectioncontext';
 import {BoardContext, IBoardContext} from '@/app/components/boardcontext';
 
-interface IBoardProps {
-    dimensions: dimensions,
-    acrossList: Coordinate[],
-    downList: Coordinate[]
-}
 function useOutsideClick(ref: RefObject.RefObject<HTMLDivElement>, setSelection: (f: Selection) => void) {
     /*
     This de-focuses the focused square when the user clicks anywhere outside of the board
@@ -59,6 +54,12 @@ function getSelectedWordCoords(board: string[][], {rows, columns}: dimensions, s
         }
     }
     return NO_SELECTION;
+}
+
+interface IBoardProps {
+    dimensions: dimensions,
+    acrossList: Coordinate[],
+    downList: Coordinate[]
 }
 
 export default function Board({dimensions: {rows, columns}, acrossList, downList} : IBoardProps) {
