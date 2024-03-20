@@ -78,16 +78,17 @@ export default function CrossyBuilder() {
 
     return (
     <>
-        {/* Row and Column sliders */}
-        <DimensionSliders
-            boardDimensions = {boardDimensions}
-            changeBoardSize = {changeBoardSize}
-        />
-        <h2>Direction: {directionText}</h2>
         {/* Board + Question Lists */}
         <div className={styles.layout}>
+        {/* Row and Column sliders */}
+            <div>
+            <DimensionSliders
+                boardDimensions = {boardDimensions}
+                changeBoardSize = {changeBoardSize}
+            />
+            <WordFinder />
+            </div>
             <SelectionContext.Provider value = {{selection, setSelection}}>
-                <WordFinder />
                 <BoardContext.Provider value = {{board, setBoard}}>
                     <Board 
                     dimensions = {boardDimensions} 

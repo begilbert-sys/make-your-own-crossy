@@ -129,14 +129,16 @@ export default function Board({dimensions: {rows, columns}, acrossList, downList
             )
         }
         boardArray.push(
-            <div key = {row} className="flex">
+            <div key = {row} className={styles.boardRow}>
                 {rowArray}
             </div>
         )
     }
     return (
-        <div className={styles.board} ref={clickWrapperRef}>
-            {boardArray}
+        <div className={styles.boardWrapper}>
+            <div className={styles.board} ref={clickWrapperRef}>
+                {boardArray}
+            </div>
         </div>
     );
   }

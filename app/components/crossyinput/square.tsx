@@ -6,6 +6,10 @@ import {dimensions, Selection, Coordinate} from '@/app/components/crossyinput/ty
 import {SelectionContext, ISelectionContext} from '@/app/components/crossyinput/selectioncontext';
 import {BoardContext, IBoardContext} from '@/app/components/crossyinput/boardcontext';
 
+function getBoardSize({rows, columns} : dimensions) {
+    /* returns some tailwind based on the board's dimensions */
+    return rows > columns ? rows : columns;
+}
 
 function getNextSquare(coords: Coordinate, boardDimensions: dimensions, selection: Selection): Coordinate {
     const focusDirection = selection.direction;
@@ -56,9 +60,9 @@ export default function Square({coords, boardDimensions, highlighted, nextWord, 
 
     const classList = clsx(
         styles.square,
-        {"bg-square-lightblue": highlighted},
-        {"bg-black": char === ' '},
-        {"!bg-square-yellow": coords.equals(selection.coordinate) && selection.focus} 
+        {[styles.highlighted]: highlighted},
+        {[styles.blank]: char === ' '},
+        {[styles.selected]: coords.equals(selection.coordinate) && selection.focus} 
     );
 
     const handleKeyPress = (e: KeyboardEvent) => {
@@ -136,9 +140,9 @@ export default function Square({coords, boardDimensions, highlighted, nextWord, 
         setSelection(modifiedSelection);
     }
     return (
-    <div>
+    <div style={{ "--board-size": getBoardSize(boardDimensions) } as React.CSSProperties}>
         <div className = {styles.cornerValue}>{cornerValue}</div>
-        <input 
+        <input
             ref = {inputRef}
             type = "text"
             value = {char}

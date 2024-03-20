@@ -62,13 +62,13 @@ export default function Clues({boardDimensions: {rows, columns}, acrossList, dow
         <>
             <div>
                 <h2><b>ACROSS</b></h2>
-                <ol className="list-decimal">
+                <ol>
                     {clueListAcross}
                 </ol>
             </div>
             <div>
                 <h2><b>DOWN</b></h2>
-                <ol className="list-decimal">
+                <ol>
                     {clueListDown}
                 </ol>
             </div>

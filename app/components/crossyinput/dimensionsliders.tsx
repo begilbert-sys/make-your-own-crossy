@@ -12,7 +12,7 @@ export default function DimensionSliders({boardDimensions, changeBoardSize}: IDi
             <br/>
             <h2>Rows:</h2>
             <Slider
-            className="w-60"
+                sx={{ width: "200px" }}
                 aria-label = "Rows"
                 valueLabelDisplay="auto"
                 value = {boardDimensions.rows}
@@ -24,7 +24,7 @@ export default function DimensionSliders({boardDimensions, changeBoardSize}: IDi
             <br />
             <h2>Columns:</h2>
             <Slider
-            className="w-60"
+                sx={{ width: "200px" }}
                 aria-label = "Rows"
                 valueLabelDisplay="auto"
                 value = {boardDimensions.columns}
