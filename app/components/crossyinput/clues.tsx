@@ -1,6 +1,7 @@
 import {useContext} from 'react';
-import {dimensions, Coordinate, NO_SELECTION} from '@/app/components/types';
-import {SelectionContext, ISelectionContext} from '@/app/components/selectioncontext';
+import {dimensions, Coordinate, NO_SELECTION} from '@/app/components/crossyinput/types';
+import {SelectionContext, ISelectionContext} from '@/app/components/crossyinput/selectioncontext';
+import TextField from '@mui/material/TextField';
 interface ICluesProps {
     boardDimensions: dimensions,
     acrossList: Coordinate[],
@@ -35,7 +36,11 @@ export default function Clues({boardDimensions: {rows, columns}, acrossList, dow
                 clueNumber++;
                 const index = acrossList.length - acrossListCopy.length;
                 let acrossCoords = acrossListCopy.pop() as Coordinate;
-                clueListAcross.push(<li value = {clueNumber} key={index}><input type="text" onSelect = {() => reFocusAcross(acrossCoords)}/></li>);
+                clueListAcross.push(
+                    <li value = {clueNumber} key={index}>
+                        <TextField multiline size="small" variant="outlined" onSelect = {() => reFocusAcross(acrossCoords)}/>
+                    </li>
+                );
                 added = true;
             }
             if (downListCopy.length > 0 && coords.equals(downListCopy.at(-1) as Coordinate)) {
@@ -44,10 +49,15 @@ export default function Clues({boardDimensions: {rows, columns}, acrossList, dow
                 }
                 const index = downList.length - downListCopy.length;
                 let downCoords = downListCopy.pop() as Coordinate;
-                clueListDown.push(<li value = {clueNumber} key={index}><input type="text" onSelect = {() => reFocusDown(downCoords)}/></li>);
+                clueListDown.push(
+                    <li value = {clueNumber} key={index}>
+                        <TextField multiline size="small" variant="outlined" onSelect = {() => reFocusDown(downCoords)}/>
+                    </li>
+                );
             }
         }
     }
+
     return (
         <>
             <div>

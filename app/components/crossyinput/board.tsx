@@ -1,18 +1,25 @@
 'use client';
-import RefObject, { useState, useEffect, useRef, useContext } from 'react';
-import Square from '@/app/components/square';
-import {dimensions, Coordinate, Selection, NO_SELECTION} from '@/app/components/types';
-import {SelectionContext, ISelectionContext} from '@/app/components/selectioncontext';
-import {BoardContext, IBoardContext} from '@/app/components/boardcontext';
+import styles from '@/styles/Home.module.css';
 
+import RefObject, { useState, useEffect, useRef, useContext } from 'react';
+import Square from '@/app/components/crossyinput/square';
+import {dimensions, Coordinate, Selection, NO_SELECTION} from '@/app/components/crossyinput/types';
+import {SelectionContext, ISelectionContext} from '@/app/components/crossyinput/selectioncontext';
+import {BoardContext, IBoardContext} from '@/app/components/crossyinput/boardcontext';
+
+function isTextBox(target: EventTarget | null) {
+    /* checks if the event target is a textbox */
+    return (target instanceof HTMLTextAreaElement) || (target as HTMLDivElement).classList.contains("MuiInputBase-root");
+}
 function useOutsideClick(ref: RefObject.RefObject<HTMLDivElement>, setSelection: (f: Selection) => void) {
     /*
     This de-focuses the focused square when the user clicks anywhere outside of the board
     */
     useEffect(() => {
         function handleClickOutside(event: globalThis.MouseEvent) {
-            // note: clicking an input shouldn't de-focus, because when selecting a clue input the user needs to see which letters get highlighted
-            if (ref.current && !ref.current.contains(event.target as Node) && !(event.target instanceof HTMLInputElement)) {
+            console.log(event.target);
+            // note: clicking an textarea shouldn't de-focus, because when selecting a clue textarea the user needs to see which letters get highlighted
+            if (ref.current && !ref.current.contains(event.target as Node) && !(isTextBox(event.target))) {
                 // this just resets the selection/focus to nothing 
                 setSelection({
                     coordinate: NO_SELECTION,
@@ -128,7 +135,7 @@ export default function Board({dimensions: {rows, columns}, acrossList, downList
         )
     }
     return (
-        <div ref={clickWrapperRef}>
+        <div className={styles.board} ref={clickWrapperRef}>
             {boardArray}
         </div>
     );

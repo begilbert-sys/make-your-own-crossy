@@ -2,9 +2,9 @@ import { KeyboardEvent, useState, useRef, createContext, useContext } from 'reac
 import styles from '@/styles/Home.module.css';
 import clsx from 'clsx';
 
-import {dimensions, Selection, Coordinate} from '@/app/components/types';
-import {SelectionContext, ISelectionContext} from '@/app/components/selectioncontext';
-import {BoardContext, IBoardContext} from '@/app/components/boardcontext';
+import {dimensions, Selection, Coordinate} from '@/app/components/crossyinput/types';
+import {SelectionContext, ISelectionContext} from '@/app/components/crossyinput/selectioncontext';
+import {BoardContext, IBoardContext} from '@/app/components/crossyinput/boardcontext';
 
 
 function getNextSquare(coords: Coordinate, boardDimensions: dimensions, selection: Selection): Coordinate {

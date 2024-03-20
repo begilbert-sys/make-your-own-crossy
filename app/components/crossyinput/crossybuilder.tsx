@@ -2,11 +2,13 @@
 import {useState, useRef} from 'react';
 import styles from '@/styles/Home.module.css';
 
-import Board from "@/app/components/board";
-import Clues from "@/app/components/clues";
-import {BoardContext} from '@/app/components/boardcontext';
-import {SelectionContext} from '@/app/components/selectioncontext';
-import {dimensions, Coordinate, Selection, NO_SELECTION} from '@/app/components/types';
+import Board from "@/app/components/crossyinput/board";
+import DimensionSliders from "@/app/components/crossyinput/dimensionsliders";
+import Clues from "@/app/components/crossyinput/clues";
+import WordFinder from  "@/app/components/crossyinput/wordfinder";
+import {BoardContext} from '@/app/components/crossyinput/boardcontext';
+import {SelectionContext} from '@/app/components/crossyinput/selectioncontext';
+import {dimensions, Coordinate, Selection, NO_SELECTION} from '@/app/components/crossyinput/types';
 
 function getAcrossList(board: string[][], {rows, columns} : dimensions): Coordinate[] {
     /* Get a list of all coordinates that should be marked with a horizontal ("across") corner value */
@@ -38,12 +40,11 @@ function getDownList(board: string[][], {rows, columns} : dimensions): Coordinat
     return downList;
 }
 
-export default function CrossyBuilder() {
-    // board starts as 5x5 by default 
-    const rows  = useRef<number>(5);
-    const columns = useRef<number>(5);
+export default function CrossyBuilder() { 
+    // board starts as 5x5 by default  
+    const [boardDimensions, setBoardDimensions] = useState<dimensions>({rows: 5, columns: 5})
 
-    const defaultBoard = Array(rows.current).fill(Array(columns.current).fill(' '));
+    const defaultBoard = Array(boardDimensions.rows).fill(Array(boardDimensions.columns).fill(' '));
     const [board, setBoard] = useState<string[][]>(defaultBoard);
 
     const [selection, setSelection] = useState<Selection>({
@@ -52,20 +53,16 @@ export default function CrossyBuilder() {
         focus: false
     });
 
-    const dimensions: dimensions = {rows: rows.current, columns: columns.current}
-
-    const acrossList = getAcrossList(board, dimensions);
-    const downList = getDownList(board, dimensions);
+    const acrossList = getAcrossList(board, boardDimensions);
+    const downList = getDownList(board, boardDimensions);
 
     function changeBoardSize (newRows: number, newColumns: number): void {
         /* change the board's size */
-        const oldRows = board.length;
-        const oldColumns = board[0].length;
         let newBoard = [];
         for (let row = 0; row < newRows; row++) {
             let newRow = [];
             for (let col = 0; col < newColumns; col++) {
-                if (row < oldRows && col < oldColumns) {
+                if (row < boardDimensions.rows && col < boardDimensions.columns) {
                     newRow.push(board[row][col]);  
                 } else {
                     newRow.push(' ');
@@ -73,35 +70,33 @@ export default function CrossyBuilder() {
             }
             newBoard.push(newRow);
         }
-        rows.current = newRows;
-        columns.current = newColumns;
+        setBoardDimensions({rows: newRows, columns: newColumns});
         setBoard(newBoard);
     }
-    
+
+    const directionText = selection.direction === "horizontal" ? "Across →  " : "Down ↓ ";
+
     return (
     <>
         {/* Row and Column sliders */}
-        <input type="range" min="3" max="8" 
-            value={rows.current} 
-            onChange = {(e) => changeBoardSize(Number(e.target.value), columns.current)}
+        <DimensionSliders
+            boardDimensions = {boardDimensions}
+            changeBoardSize = {changeBoardSize}
         />
-        <input type="range" min="3" max="8" 
-            value={columns.current} 
-            onChange = {(e) => changeBoardSize(rows.current, Number(e.target.value))}
-        />
-
+        <h2>Direction: {directionText}</h2>
         {/* Board + Question Lists */}
         <div className={styles.layout}>
             <SelectionContext.Provider value = {{selection, setSelection}}>
+                <WordFinder />
                 <BoardContext.Provider value = {{board, setBoard}}>
                     <Board 
-                    dimensions = {dimensions} 
+                    dimensions = {boardDimensions} 
                     acrossList = {acrossList}
                     downList = {downList} />
                 </BoardContext.Provider>
                 
                 <Clues
-                boardDimensions = {dimensions}
+                boardDimensions = {boardDimensions}
                 acrossList = {acrossList} 
                 downList = {downList}
                 />

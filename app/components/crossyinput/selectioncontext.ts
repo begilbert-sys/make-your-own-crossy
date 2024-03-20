@@ -1,5 +1,5 @@
 import { createContext } from 'react';
-import {Selection, NO_SELECTION} from '@/app/components/types';
+import {Selection, NO_SELECTION} from '@/app/components/crossyinput/types';
 export interface ISelectionContext {
     selection: Selection,
     setSelection: (f: Selection) => void

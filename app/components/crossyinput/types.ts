@@ -1,5 +1,10 @@
 export type direction = "horizontal" | "vertical";
 
+export interface dimensions {
+    rows: number,
+    columns: number
+}
+
 export class Coordinate {
     row: number;
     column: number;
@@ -22,13 +27,3 @@ export interface Selection {
 // this is what focus gets assigned to when there is no focused coord
 // it's a lot easier than making focus a "coordinate | null" type 
 export const NO_SELECTION: Coordinate = new Coordinate(-1, -1);
-
-export interface dimensions {
-    rows: number,
-    columns: number
-}
-
-export interface wordselection {
-    word: number,
-    direction: direction
-}
