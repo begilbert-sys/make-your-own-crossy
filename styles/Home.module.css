@@ -35,6 +35,12 @@
 	padding-left:calc(25px / var(--board-size));
 	padding-top:calc(100px / var(--board-size));
 }
+.floatingArrow {
+	position: absolute;
+	font-size: calc(150px / var(--board-size));
+	padding-left:calc(340px / var(--board-size));
+	padding-top:calc(20px / var(--board-size));
+}
 
 .board {
 	line-height:0;
@@ -59,14 +65,30 @@
 	justify-content: space-evenly;
 }
 
+
+.sliderRow {
+	display:flex;
+	justify-content:flex-start;
+	align-items:center;
+}
 .wordFinderWrapper {
 	display: flex;
 	flex-direction: column;
 	justify-content: center;
+	align-items:center;
 }
 .wordFinderInput {
-	text-align: center;
+	text-align:center;
 	font-size: 1.275rem;
 	text-transform: uppercase;
 	letter-spacing: .3rem;
 }
+
+.clueList {
+	height: 425px;
+	overflow-y:auto;
+}
+.clue:not(:last-child) { 
+    margin-bottom: 20px;  
+}
+

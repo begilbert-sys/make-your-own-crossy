@@ -1,55 +1,62 @@
-import { KeyboardEvent, useState, useRef, createContext, useContext } from 'react';
-import styles from '@/styles/Home.module.css';
+import { KeyboardEvent, useRef, useContext } from 'react';
+
+import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward';
+import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import clsx from 'clsx';
 
-import {dimensions, Selection, Coordinate} from '@/app/components/crossyinput/types';
-import {SelectionContext, ISelectionContext} from '@/app/components/crossyinput/selectioncontext';
-import {BoardContext, IBoardContext} from '@/app/components/crossyinput/boardcontext';
+import styles from '@/styles/Home.module.css';
 
-function getBoardSize({rows, columns} : dimensions) {
-    /* returns some tailwind based on the board's dimensions */
-    return rows > columns ? rows : columns;
+import { Coordinate } from '@/app/types/coordinate';
+import { Board } from '@/app/types/board';
+import { Selection } from '@/app/types/selection';
+
+import { BoardContext, IBoardContext } from '@/app/contexts/boardcontext';
+import { SelectionContext, ISelectionContext } from '@/app/contexts/selectioncontext';
+
+function getMaxBoardSize(board: Board) {
+    /* returns max(rows, columns) */
+    return board.rows > board.columns ? board.rows : board.columns;
 }
 
-function getNextSquare(coords: Coordinate, boardDimensions: dimensions, selection: Selection): Coordinate {
+function getNextSquare(coords: Coordinate, selection: Selection, rows: number, columns: number): Coordinate {
     const focusDirection = selection.direction;
     // don't go anywhere if it's the last square on the board 
-    if (coords.row === boardDimensions.rows - 1 && coords.column === boardDimensions.columns - 1) {
+    if (coords.row === rows - 1 && coords.column === columns - 1) {
         return coords;
     }
     if (focusDirection === "horizontal") {
-        return coords.column === boardDimensions.columns - 1 ? new Coordinate(coords.row + 1, 0) : new Coordinate(coords.row, coords.column + 1);
+        return coords.column === columns - 1 ? new Coordinate(coords.row + 1, 0) : new Coordinate(coords.row, coords.column + 1);
     } else {
-        return coords.row === boardDimensions.rows - 1 ? new Coordinate(0, coords.column + 1) : new Coordinate(coords.row + 1, coords.column);
+        return coords.row === rows - 1 ? new Coordinate(0, coords.column + 1) : new Coordinate(coords.row + 1, coords.column);
     }
 }
-function getPrevSquare(coords: Coordinate, boardDimensions: dimensions, selection: Selection): Coordinate {
+function getPrevSquare(coords: Coordinate, selection: Selection, rows: number, columns: number): Coordinate {
     const focusDirection = selection.direction;
     // don't go anywhere if it's the last square on the board 
     if (coords.row === 0 && coords.column === 0) {
         return coords;
     }
     if (focusDirection === "horizontal") {
-        return coords.column === 0 ? new Coordinate(coords.row - 1, boardDimensions.columns - 1) : new Coordinate(coords.row, coords.column - 1);
+        return coords.column === 0 ? new Coordinate(coords.row - 1, columns - 1) : new Coordinate(coords.row, coords.column - 1);
     } else {
-        return coords.row === 0 ? new Coordinate(boardDimensions.rows - 1, coords.column - 1) : new Coordinate(coords.row - 1, coords.column);
+        return coords.row === 0 ? new Coordinate(rows - 1, coords.column - 1) : new Coordinate(coords.row - 1, coords.column);
     }
 }
 
 interface ISquareProps {
     coords: Coordinate,
-    boardDimensions: dimensions,
     highlighted: boolean,
     nextWord?: Coordinate,
     cornerValue?: number,
 }
-export default function Square({coords, boardDimensions, highlighted, nextWord, cornerValue} : ISquareProps) {
+export default function Square({coords, highlighted, nextWord, cornerValue} : ISquareProps) {
     const {selection, setSelection} = useContext<ISelectionContext>(SelectionContext);
     const {board, setBoard} = useContext<IBoardContext>(BoardContext);
-    const char = board[coords.row][coords.column];
+
+    let char = board.getCoord(coords);
     const setChar = (newChar: string) => {
-        var newBoard = board.map(arr => [...arr]);
-        newBoard[coords.row][coords.column] = newChar;
+        let newBoard = new Board(board.rows, board.columns, board);
+        newBoard.setCoord(coords, newChar);
         setBoard(newBoard);
     };
 
@@ -72,7 +79,7 @@ export default function Square({coords, boardDimensions, highlighted, nextWord, 
             case "Backspace":
                 /* delete square value and move one square back */
                 setChar(' ');
-                modifiedSelection.coordinate = getPrevSquare(coords, boardDimensions, selection);
+                modifiedSelection.coordinate = getPrevSquare(coords,selection, board.rows, board.columns);
                 break;
 
             case "Enter":
@@ -96,7 +103,7 @@ export default function Square({coords, boardDimensions, highlighted, nextWord, 
                 if (modifiedSelection.direction === "horizontal") {
                     modifiedSelection.direction = "vertical"
                 } 
-                else if (selection.coordinate.row !== boardDimensions.rows - 1) {
+                else if (selection.coordinate.row !== board.rows - 1) {
                     modifiedSelection.coordinate = new Coordinate(selection.coordinate.row  + 1, selection.coordinate.column);
                 }
                 break;
@@ -105,7 +112,7 @@ export default function Square({coords, boardDimensions, highlighted, nextWord, 
                 if (modifiedSelection.direction === "vertical") {
                     modifiedSelection.direction = "horizontal"
                 } 
-                else if (selection.coordinate.column !== boardDimensions.columns - 1) {
+                else if (selection.coordinate.column !== board.columns - 1) {
                     modifiedSelection.coordinate = new Coordinate(selection.coordinate.row, selection.coordinate.column + 1);
                 }
                 break;
@@ -123,7 +130,7 @@ export default function Square({coords, boardDimensions, highlighted, nextWord, 
                 /* if the keypress was a letter, assign the square to that letter */
                 if (e.key.length === 1 && e.key.match(/[a-zA-Z]/)) {
                     setChar(e.key);
-                    modifiedSelection.coordinate = getNextSquare(coords, boardDimensions, selection);
+                    modifiedSelection.coordinate = getNextSquare(coords, selection, board.rows, board.columns);
                 }
         }
         setSelection(modifiedSelection);
@@ -139,8 +146,15 @@ export default function Square({coords, boardDimensions, highlighted, nextWord, 
         modifiedSelection.focus = true;
         setSelection(modifiedSelection);
     }
+    let floatingArrow;
+    if (coords.equals(selection.coordinate)) {
+        const arrowIcon = (selection.direction === "horizontal" ? 
+        <ArrowForwardIcon fontSize="inherit"/> : <ArrowDownwardIcon fontSize="inherit"/>);
+        floatingArrow = <div className={styles.floatingArrow} onClick = {handleClick} >{arrowIcon}</div>;
+    }
     return (
-    <div style={{ "--board-size": getBoardSize(boardDimensions) } as React.CSSProperties}>
+    <div style={{ "--board-size": getMaxBoardSize(board) } as React.CSSProperties}>
+        {floatingArrow}
         <div className = {styles.cornerValue}>{cornerValue}</div>
         <input
             ref = {inputRef}

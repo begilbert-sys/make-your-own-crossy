@@ -1,7 +1,7 @@
 import { StrictMode } from 'react';
 import { StyledEngineProvider } from '@mui/material/styles';
 
-import CrossyBuilder from "@/app/components/crossyinput/crossybuilder";
+import CrossyBuilder from "@/app/components/crossybuilder";
 
 
 export default function Home() {
