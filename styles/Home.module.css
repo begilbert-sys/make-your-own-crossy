@@ -23,12 +23,17 @@
 .highlighted {
 	background-color: #A7D8FF;
 }
-.blank {
+.disabled {
 	background-color: #000;
 }
 .selected {
-	background-color: #FFD902 !important;
+	background-color: #FFD902
 }
+.disabledSelected {
+	background-color: #927B02 !important;
+}
+
+ 
 .cornerValue {
 	position: absolute;
 	font-size: calc(165px / var(--board-size));

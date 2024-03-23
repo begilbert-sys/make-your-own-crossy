@@ -2,20 +2,20 @@ import { Coordinate } from "@/app/types/coordinate";
 import { Selection, Direction } from "@/app/types/selection";
 
 export class Board {
-    private board: string[][]
+    board: string[][]
     rows: number
     columns: number
 
     constructor(rows: number, columns: number, oldBoard?: Board) {
-        this.rows = oldBoard ? oldBoard.rows : rows;
-        this.columns = oldBoard ? oldBoard.columns : columns;
+        this.rows = rows;
+        this.columns = columns;
         if (oldBoard) {
             this.board = [];
             for (let row = 0; row < rows; row++) {
                 let newRow = [];
                 for (let col = 0; col < columns; col++) {
                     if (row < oldBoard.rows && col < oldBoard.columns) {
-                        newRow.push(oldBoard.get(row, columns));  
+                        newRow.push(oldBoard.get(row, col));  
                     } else {
                         newRow.push(' ');
                     }
@@ -42,11 +42,11 @@ export class Board {
     setCoord(coord: Coordinate, value: string) {
         this.set(coord.row, coord.column, value);
     }
-    get(row: number, column: number): string{
+    get(row: number, column: number): string {
         return this.board[row][column];
     }
     getCoord(coord: Coordinate) {
-        return this.board[coord.row][coord.column];
+        return this.get(coord.row, coord.column);
     }
 
     getAcrossList(): Coordinate[] {
@@ -70,8 +70,8 @@ export class Board {
         for (let row = 0; row < this.rows; row++) {
             for (let col = 0; col < this.columns; col++) {
                 if (this.board[row][col] != '.' 
-                && (row === 0 || this.board[row-1][col] === ' ')
-                && (row + 2 < this.rows && this.board[row+1][col] != ' ' && this.board[row+2][col] != ' ')) {
+                && (row === 0 || this.board[row-1][col] === '.')
+                && (row + 2 < this.rows && this.board[row+1][col] != '.' && this.board[row+2][col] != '.')) {
                     downList.push(new Coordinate(row, col));
                 }
             }

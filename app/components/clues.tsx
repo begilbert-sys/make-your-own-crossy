@@ -39,10 +39,9 @@ export default function Clues() {
             let added = false;
             if (acrossList.length > 0 && coords.equals(acrossList.at(-1)!)) {
                 clueNumber++;
-                const index = acrossList.length - acrossList.length;
                 let acrossCoords = acrossList.pop()!;
                 clueListAcross.push(
-                    <li value = {clueNumber} key={index} className={styles.clue}>
+                    <li value = {clueNumber} key={clueNumber} className={styles.clue}>
                         <TextField multiline size="small" variant="outlined" onFocus= {() => reFocusAcross(acrossCoords)}/>
                     </li>
                 );
@@ -52,10 +51,9 @@ export default function Clues() {
                 if (!added) {
                     clueNumber++;
                 }
-                const index = downList.length - downList.length;
                 let downCoords = downList.pop()!;
                 clueListDown.push(
-                    <li value = {clueNumber} key={index} className={styles.clue}>
+                    <li value = {clueNumber} key={clueNumber} className={styles.clue}>
                         <TextField multiline size="small" variant="outlined" onFocus= {() => reFocusDown(downCoords)}/>
                     </li>
                 );

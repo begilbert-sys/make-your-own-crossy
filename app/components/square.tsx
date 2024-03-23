@@ -14,7 +14,7 @@ import { BoardContext, IBoardContext } from '@/app/contexts/boardcontext';
 import { SelectionContext, ISelectionContext } from '@/app/contexts/selectioncontext';
 
 function getMaxBoardSize(board: Board) {
-    /* returns max(rows, columns) */
+    /* return max(rows, columns) */
     return board.rows > board.columns ? board.rows : board.columns;
 }
 
@@ -52,24 +52,26 @@ interface ISquareProps {
 export default function Square({coords, highlighted, nextWord, cornerValue} : ISquareProps) {
     const {selection, setSelection} = useContext<ISelectionContext>(SelectionContext);
     const {board, setBoard} = useContext<IBoardContext>(BoardContext);
-
-    let char = board.getCoord(coords);
+    
+    const inputRef = useRef<HTMLInputElement>(null);
+    if (inputRef.current != null && selection.focus && coords.equals(selection.coordinate)) {
+        inputRef.current.focus();
+    }
+    
+    const char: string = board.getCoord(coords);
+    const disabled = char === '.';
     const setChar = (newChar: string) => {
         let newBoard = new Board(board.rows, board.columns, board);
         newBoard.setCoord(coords, newChar);
         setBoard(newBoard);
     };
 
-    const inputRef = useRef<HTMLInputElement>(null);
-    if (inputRef.current != null && selection.focus && coords.equals(selection.coordinate)) {
-        inputRef.current.focus();
-    }
-
     const classList = clsx(
         styles.square,
         {[styles.highlighted]: highlighted},
-        {[styles.blank]: char === ' '},
-        {[styles.selected]: coords.equals(selection.coordinate) && selection.focus} 
+        {[styles.disabled]: disabled},
+        {[styles.selected]: coords.equals(selection.coordinate) && selection.focus},
+        {[styles.disabledSelected]: disabled && coords.equals(selection.coordinate) && selection.focus}
     );
 
     const handleKeyPress = (e: KeyboardEvent) => {
@@ -86,6 +88,14 @@ export default function Square({coords, highlighted, nextWord, cornerValue} : IS
                 /* jump to the next word */
                 if (nextWord) {
                     modifiedSelection.coordinate = nextWord;
+                }
+                break;
+
+            case '.':
+                if (disabled) {
+                    setChar(' ');
+                } else {
+                    setChar('.');
                 }
                 break;
 
@@ -125,11 +135,10 @@ export default function Square({coords, highlighted, nextWord, cornerValue} : IS
                     modifiedSelection.coordinate = new Coordinate(selection.coordinate.row, selection.coordinate.column - 1);
                 }
                 break;
-
             default:
                 /* if the keypress was a letter, assign the square to that letter */
                 if (e.key.length === 1 && e.key.match(/[a-zA-Z]/)) {
-                    setChar(e.key);
+                    setChar(e.key.toLowerCase());
                     modifiedSelection.coordinate = getNextSquare(coords, selection, board.rows, board.columns);
                 }
         }
@@ -146,6 +155,7 @@ export default function Square({coords, highlighted, nextWord, cornerValue} : IS
         modifiedSelection.focus = true;
         setSelection(modifiedSelection);
     }
+
     let floatingArrow;
     if (coords.equals(selection.coordinate)) {
         const arrowIcon = (selection.direction === "horizontal" ? 
@@ -159,7 +169,7 @@ export default function Square({coords, highlighted, nextWord, cornerValue} : IS
         <input
             ref = {inputRef}
             type = "text"
-            value = {char}
+            value = {char === '.' ? ' ' : char}
             maxLength = {1}
             className = {classList} 
             onKeyDown = {handleKeyPress}

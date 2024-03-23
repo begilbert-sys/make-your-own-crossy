@@ -12,7 +12,8 @@ import { SelectionContext } from '@/app/contexts/selectioncontext';
 import BoardComponent from "@/app/components/boardcomponent";
 import DimensionSliders from "@/app/components/dimensionsliders";
 import Clues from "@/app/components/clues";
-import WordFinder from  "@/app/components/wordfinder";
+import WordFinder from "@/app/components/wordfinder";
+import AutoFill from "@/app/components/autofill";
 
 
 export default function CrossyBuilder() { 
@@ -29,13 +30,13 @@ export default function CrossyBuilder() {
         {/* Board + Question Lists */}
         <div className={styles.layout}>
         {/* Row and Column sliders */}
-            <div>
+        <div>
             <DimensionSliders />
             <hr/>
-\
             </div>
             <SelectionContext.Provider value = {{selection, setSelection}}>
                 <BoardContext.Provider value = {{board, setBoard}}>
+                    <AutoFill />
                     <BoardComponent />
                 </BoardContext.Provider>
                 

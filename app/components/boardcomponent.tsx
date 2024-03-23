@@ -23,7 +23,6 @@ function useOutsideClick(ref: RefObject.RefObject<HTMLDivElement>, setSelection:
     */
     useEffect(() => {
         function handleClickOutside(event: globalThis.MouseEvent) {
-            console.log(event.target);
             // note: clicking an textarea shouldn't de-focus, because when selecting a clue textarea the user needs to see which letters get highlighted
             if (ref.current && !ref.current.contains(event.target as Node) && !(isTextBox(event.target))) {
                 // this just resets the selection/focus to nothing 
@@ -95,11 +94,11 @@ export default function BoardComponent() {
             let shouldHighlight = highlight && (selection.direction === "horizontal" ? row === selection.coordinate.row : col === selection.coordinate.column);
             rowArray.push(
                 <Square 
-                key = {col}
-                coords = {coords}
-                highlighted = {shouldHighlight}
-                nextWord = {nextWord}
-                cornerValue = {hasCornerValue ? cornerValue : undefined}
+                    key = {col}
+                    coords = {coords}
+                    highlighted = {shouldHighlight}
+                    nextWord = {nextWord}
+                    cornerValue = {hasCornerValue ? cornerValue : undefined}
                 />
             )
         }
