@@ -79,6 +79,30 @@ export class Board {
         return downList;
     }
 
+    getWord(startCoord: Coordinate, direction: Direction): string {
+        let result = "";
+        let currentCoord = startCoord;
+        while (true) {
+            const char = this.getCoord(currentCoord);
+            if (char === '.') {
+                return result;
+            }
+            result += this.getCoord(currentCoord);
+            if (direction === "horizontal") {
+                if (currentCoord.column >= this.columns - 1) {
+                    return result;
+                }
+                currentCoord = new Coordinate(currentCoord.row, currentCoord.column + 1);
+            }
+            else {
+                if (currentCoord.row >= this.rows - 1) {
+                    return result;
+                }
+                currentCoord = new Coordinate(currentCoord.row + 1, currentCoord.column);
+            }
+        }
+    }
+
     getSelectionWord(selection: Selection): Coordinate {
         /* Get the coordinate of the first letter of the selected word  */
         let wordList: Coordinate[] = (
