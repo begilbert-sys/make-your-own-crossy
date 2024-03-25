@@ -24,7 +24,14 @@ export class Board {
             }
         }
         else {
-            this.board = [...Array(rows)].map(e => Array(columns).fill(' '));
+            this.board = [];
+            for (let row = 0; row < rows; row++) {
+                let newRow = [];
+                for (let col = 0; col < columns; col++) {
+                    newRow.push(' ');
+                }
+                this.board.push(newRow);
+            }
         }
     }
 
@@ -98,6 +105,21 @@ export class Board {
                 if (currentCoord.row >= this.rows - 1) {
                     return result;
                 }
+                currentCoord = new Coordinate(currentCoord.row + 1, currentCoord.column);
+            }
+        }
+    }
+
+    setWord(startCoord: Coordinate, direction: Direction, word: string): void {
+        let currentCoord = startCoord;
+        for (let i = 0; i < word.length; i++) {
+            if (this.getCoord(currentCoord) == '.') {
+                throw new Error("word \"" + word + "\" does not fit at (" + startCoord.row + ", " + startCoord.column + ")");
+            }
+            this.setCoord(currentCoord, word[i]);
+            if (direction === 'horizontal') {
+                currentCoord = new Coordinate(currentCoord.row, currentCoord.column + 1);
+            } else {
                 currentCoord = new Coordinate(currentCoord.row + 1, currentCoord.column);
             }
         }
