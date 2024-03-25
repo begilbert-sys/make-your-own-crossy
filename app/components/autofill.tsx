@@ -21,11 +21,36 @@ function shuffleArray(array: any[]) {
     return copyList;
 }
 
+function wordToBinary(word: string): number {
+    const offset = 96;
+    let num = 0;
+    for (let i = 0; i < word.length; i++) {
+        const letter = word[i];
+        num <<= 5;
+        if (letter !== ' ') {
+            num |= letter.charCodeAt(0) - offset;
+        }
+    }
+    return num;
+}
+function getQueryFilter(query: string) {
+    const offset = 96;
+    let num = 0;
+    for (let i = 0; i < query.length; i++) {
+        const letter = query[i];
+        num <<= 5;
+        if (letter !== ' ') {
+            num |= 0b11111;
+        }
+    }
+    return num;
+}
+
 var shuffledWordBank = shuffleArray(wordBank);
-var lenWordBank: string[][] = [[], [], [], [], [], []];
+var lenWordBank: {word: string, bin: number}[][] = [[], [], [], [], [], []];
 for (let i = 0; i < shuffledWordBank.length; i++) {
     const word = shuffledWordBank[i];
-    lenWordBank[word.length - 3].push(word);
+    lenWordBank[word.length - 3].push({word: word, bin: wordToBinary(word)});
 }
 var iters = 0;
 function queryMatch(query: string, word: string): boolean {
@@ -39,17 +64,22 @@ function queryMatch(query: string, word: string): boolean {
     }
     return true;
 }
+function queryMatchBinary(queryBin: number, queryFilterBin: number, wordBin: number): boolean {
+    return (wordBin & queryFilterBin) === queryBin;
+}
 
 function checkDownWords(board: Board, downList: Coordinate[]): boolean {
     for (let i = 0; i < downList.length; i++) {
         const startCoord = downList[i];
         const query = board.getWord(startCoord, "vertical");
+        const queryBin = wordToBinary(query);
+        const queryFilterBin = getQueryFilter(query);
         const candidateList = lenWordBank[query.length - 3];
         let valid = false;
         for (let j = 0; j < candidateList.length; j++) {
             iters++;
             const word = candidateList[j];
-            if (queryMatch(query, word)) {
+            if (queryMatchBinary(queryBin, queryFilterBin, word.bin)) {
                 valid = true;
                 break;
             }
@@ -74,11 +104,13 @@ function recur(
     const startCoord = acrossList[acrossListIndex];
     const query = board.getWord(startCoord, "horizontal");
     const candidateList = lenWordBank[query.length - 3];
+    const queryBin = wordToBinary(query);
+    const queryFilterBin = getQueryFilter(query);
     for (let i = 0; i < candidateList.length; i++) {
         const word = candidateList[i];
-        if (queryMatch(query, word) && !used.includes(word)) {
-            board.setWord(startCoord, "horizontal", word);
-            if (checkDownWords(board, downList) && recur(board, setBoard, acrossList, downList, acrossListIndex + 1, used.concat([word]))) {
+        if (queryMatchBinary(queryBin, queryFilterBin, word.bin) && !used.includes(word.word)) {
+            board.setWord(startCoord, "horizontal", word.word);
+            if (checkDownWords(board, downList) && recur(board, setBoard, acrossList, downList, acrossListIndex + 1, used.concat([word.word]))) {
                 return true;
             }
         }
