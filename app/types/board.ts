@@ -2,7 +2,7 @@ import { Coordinate } from "@/app/types/coordinate";
 import { Selection, Direction } from "@/app/types/selection";
 
 export class Board {
-    board: string[][]
+    private board: string[][]
     rows: number
     columns: number
 
