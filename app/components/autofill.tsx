@@ -11,6 +11,6 @@ export default function AutoFill() {
         setBoard(newBoard);
 
     }
-    return <Button variant="contained" onClick={handleClick}></Button>
+    return <Button variant="contained" onClick={handleClick}>Generate</Button>
 
 }

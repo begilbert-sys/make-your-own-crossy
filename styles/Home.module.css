@@ -97,3 +97,55 @@
     margin-bottom: 20px;  
 }
 
+.keyboardKey {
+	background-color: #DDDDDD;
+	box-shadow: 0 1px 0 #8D8D8E;
+	text-align: center;
+	vertical-align: middle;
+	border-radius: 4px;
+	min-width: 16px;
+	display: inline-block;
+	margin: 0 2px 4px;
+	padding: 1px 4px 0;
+	line-height: 18px;
+	height: 20px;
+	font-size: 13px
+}
+.keyboardSymbol {
+	display: flex;
+	justify-content:center;
+	align-items:center;
+	max-width: 24px;
+
+}
+.keyboardKeyWrapper {
+	width: 100px;
+	display:flex;
+}
+
+.toolList {
+	list-style-type: none;
+	padding-left: 0;
+	line-height: 2;
+}
+.toolList li {
+	display:flex;
+	justify-content: space-between;
+	align-items: center;
+}
+.toolList .keyboardKey:first-child {
+	margin-left: 20px;
+
+}
+.toolText {
+	margin-right: 20px;
+}
+
+.thing {
+	display:flex;
+	flex-direction:column;
+	justify-content:center;
+	align-items:center;
+	margin-left: 50px;
+	margin-right: 50px;
+}

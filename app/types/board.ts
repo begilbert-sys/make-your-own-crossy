@@ -7,6 +7,7 @@ export class Board {
     columns: number
 
     constructor(rows: number, columns: number, oldBoard?: Board) {
+
         this.rows = rows;
         this.columns = columns;
         if (oldBoard) {

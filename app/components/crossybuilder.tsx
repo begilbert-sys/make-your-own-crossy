@@ -14,6 +14,7 @@ import DimensionSliders from "@/app/components/dimensionsliders";
 import Clues from "@/app/components/clues";
 import WordFinder from "@/app/components/wordfinder";
 import AutoFill from "@/app/components/autofill";
+import Tools from "@/app/components/tools";
 
 
 export default function CrossyBuilder() { 
@@ -29,18 +30,20 @@ export default function CrossyBuilder() {
     <>
         {/* Board + Question Lists */}
         <div className={styles.layout}>
-        {/* Row and Column sliders */}
-        <div>
-            <DimensionSliders />
-            <hr/>
-            </div>
+            {/* Row and Column sliders */}
             <SelectionContext.Provider value = {{selection, setSelection}}>
                 <BoardContext.Provider value = {{board, setBoard}}>
-                    <AutoFill />
+                    <div>
+                        <DimensionSliders />
+                        <hr/>
+                        <Tools />
+                    </div>
+                    <div className={styles.thing}>
                     <BoardComponent />
+                    <AutoFill />
+                    </div>
+                    <Clues />
                 </BoardContext.Provider>
-                
-                <Clues />
             </SelectionContext.Provider>
         </div>
     </>
