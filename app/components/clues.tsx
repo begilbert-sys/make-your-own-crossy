@@ -2,7 +2,6 @@ import { useContext } from 'react';
 import styles from '@/styles/Home.module.css';
 
 import { Coordinate } from '@/app/types/coordinate';
-import { Board } from '@/app/types/board';
 
 import {SelectionContext, ISelectionContext} from '@/app/contexts/selectioncontext';
 import {BoardContext, IBoardContext} from '@/app/contexts/boardcontext';
@@ -16,14 +15,14 @@ export default function Clues() {
 
     let acrossList = board.getAcrossList().reverse();
     let downList = board.getDownList().reverse();
-    const reFocusAcross = (coords: Coordinate) => {
+    const handleFocusAcross = (coords: Coordinate) => {
         setSelection({
             coordinate: coords,
             direction: "horizontal",
             focus: false
         });
     }
-    const reFocusDown = (coords: Coordinate) => {
+    const handleFocusDown = (coords: Coordinate) => {
         setSelection({
             coordinate: coords,
             direction: "vertical",
@@ -42,7 +41,7 @@ export default function Clues() {
                 let acrossCoords = acrossList.pop()!;
                 clueListAcross.push(
                     <li value = {clueNumber} key={clueNumber} className={styles.clue}>
-                        <TextField multiline size="small" variant="outlined" onFocus= {() => reFocusAcross(acrossCoords)}/>
+                        <TextField multiline size="small" variant="outlined" onFocus= {() => handleFocusAcross(acrossCoords)}/>
                     </li>
                 );
                 added = true;
@@ -54,7 +53,7 @@ export default function Clues() {
                 let downCoords = downList.pop()!;
                 clueListDown.push(
                     <li value = {clueNumber} key={clueNumber} className={styles.clue}>
-                        <TextField multiline size="small" variant="outlined" onFocus= {() => reFocusDown(downCoords)}/>
+                        <TextField multiline size="small" variant="outlined" onFocus= {() => handleFocusDown(downCoords)}/>
                     </li>
                 );
             }
@@ -63,14 +62,14 @@ export default function Clues() {
 
     return (
         <>
-            <div>
-                <h2><b>ACROSS</b></h2>
+            <div className={styles.clueBox}>
+                <h2 className={styles.clueHeader}><b>ACROSS</b></h2>
                 <ol className={styles.clueList}>
                     {clueListAcross}
                 </ol>
             </div>
-            <div>
-                <h2><b>DOWN</b></h2>
+            <div className={styles.clueBox}>
+                <h2 className={styles.clueHeader}><b>DOWN</b></h2>
                 <ol className={styles.clueList}>
                     {clueListDown}
                 </ol>

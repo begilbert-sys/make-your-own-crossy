@@ -9,8 +9,15 @@ export default function AutoFill() {
     const handleClick = () => {
         const newBoard = autoFiller(board);
         setBoard(newBoard);
-
     }
-    return <Button variant="contained" onClick={handleClick}>Generate</Button>
+    
+    return (
+        <div>
+            <h3>Feeling Lazy?</h3>
+            <p>The computer can try to generate a board for you!</p>
+            <Button variant="contained" onClick={handleClick}>Generate Board</Button>
+        </div>
+
+    )
 
 }

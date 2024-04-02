@@ -9,7 +9,7 @@ import { BoardContext, IBoardContext } from '@/app/contexts/boardcontext';
 
 export default function DimensionSliders() {
     const {board, setBoard} = useContext<IBoardContext>(BoardContext);
-    const changeBoardSize = (rows: number, columns: number) => {
+    const handleChangeBoardSize = (rows: number, columns: number) => {
         setBoard(new Board(rows, columns, board));
     }
     return (
@@ -26,7 +26,7 @@ export default function DimensionSliders() {
                     min = {3}
                     max = {8}
                     marks = {true}
-                    onChange = {(e) => changeBoardSize(Number((e.target as HTMLInputElement).value), board.columns)}
+                    onChange = {(e) => handleChangeBoardSize(Number((e.target as HTMLInputElement).value), board.columns)}
                 />
             </div>
             <br />
@@ -40,7 +40,7 @@ export default function DimensionSliders() {
                     min = {3}
                     max = {8}
                     marks = {true}
-                    onChange = {(e) => changeBoardSize(board.rows, Number((e.target as HTMLInputElement).value))}
+                    onChange = {(e) => handleChangeBoardSize(board.rows, Number((e.target as HTMLInputElement).value))}
                 />
             </div>
         </div>

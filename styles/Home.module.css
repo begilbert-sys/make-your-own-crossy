@@ -32,6 +32,9 @@
 .disabledSelected {
 	background-color: #927B02 !important;
 }
+.autofilled {
+	color: blue;
+}
 
  
 .cornerValue {
@@ -89,13 +92,31 @@
 	letter-spacing: .3rem;
 }
 
+.clueHeader {
+	margin-bottom:0px;
+}
 .clueList {
-	height: 425px;
+	height: 405px;
 	overflow-y:auto;
+	border-top: 1px solid #E6E6E6;
+	padding-left: 30px;
 }
-.clue:not(:last-child) { 
+.clue { 
     margin-bottom: 20px;  
+	padding-left: 10px;
+	font-size: 16px;
+	
 }
+.clue::marker {
+	content: counter(list-item); /* Add numbering with a period */
+	font-weight: bold; /* Make the numbers bold */
+	margin-right: 5px;
+}
+
+.clue:first-child {
+	margin-top: 20px;
+}
+
 
 .keyboardKey {
 	background-color: #DDDDDD;
@@ -148,4 +169,14 @@
 	align-items:center;
 	margin-left: 50px;
 	margin-right: 50px;
+}
+
+.clueBox {
+	border-width: 3px;
+	border-style: solid;
+	border-radius: 10px;
+	border-color: #888;
+	padding-right: 20px;
+	padding-left: 10px;
+	height: 475px;
 }

@@ -1,5 +1,5 @@
 'use client';
-import {useState} from 'react';
+import { useState } from 'react';
 import styles from '@/styles/Home.module.css';
 
 import { Coordinate } from '@/app/types/coordinate';
@@ -15,6 +15,7 @@ import Clues from "@/app/components/clues";
 import WordFinder from "@/app/components/wordfinder";
 import AutoFill from "@/app/components/autofill";
 import Tools from "@/app/components/tools";
+import ClearBoard from '@/app/components/clearboard';
 
 
 export default function CrossyBuilder() { 
@@ -37,10 +38,14 @@ export default function CrossyBuilder() {
                         <DimensionSliders />
                         <hr/>
                         <Tools />
+                        <hr/>
+                        <WordFinder />
+                        <hr/>
+                        <AutoFill />
                     </div>
                     <div className={styles.thing}>
                     <BoardComponent />
-                    <AutoFill />
+                    <ClearBoard />
                     </div>
                     <Clues />
                 </BoardContext.Provider>

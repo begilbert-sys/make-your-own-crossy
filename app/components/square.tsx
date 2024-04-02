@@ -58,7 +58,8 @@ export default function Square({coords, highlighted, nextWord, cornerValue} : IS
         inputRef.current.focus();
     }
     
-    const char: string = board.getCoord(coords);
+    const char: string = board.getCoord(coords)[0];
+    const autofilled = board.getCoord(coords).length == 2;
     const disabled = char === '.';
     const setChar = (newChar: string) => {
         let newBoard = new Board(board.rows, board.columns, board);
@@ -71,7 +72,8 @@ export default function Square({coords, highlighted, nextWord, cornerValue} : IS
         {[styles.highlighted]: highlighted},
         {[styles.disabled]: disabled},
         {[styles.selected]: coords.equals(selection.coordinate) && selection.focus},
-        {[styles.disabledSelected]: disabled && coords.equals(selection.coordinate) && selection.focus}
+        {[styles.disabledSelected]: disabled && coords.equals(selection.coordinate) && selection.focus},
+        {[styles.autofilled]: autofilled}
     );
 
     const handleKeyPress = (e: KeyboardEvent) => {

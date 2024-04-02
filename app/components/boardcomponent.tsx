@@ -12,9 +12,13 @@ import { SelectionContext, ISelectionContext } from '@/app/contexts/selectioncon
 import Square from '@/app/components/square';
 
 
-function isTextBox(target: EventTarget | null) {
-    /* checks if the event target is a textbox */
-    return (target instanceof HTMLTextAreaElement) || (target as HTMLDivElement).classList.contains("MuiInputBase-root");
+function isClickable(target: EventTarget | null) {
+    /* checks if the event target is a button or textbox  */
+    return (
+        (target as Element).closest("button") // if clicking a button
+        || (target instanceof HTMLTextAreaElement) // if clicking a textbox
+        || (target as HTMLDivElement).classList.contains("MuiInputBase-root") // if clicking a MUI textbox wrapper
+    )
 }
 
 function useOutsideClick(ref: RefObject.RefObject<HTMLDivElement>, setSelection: (f: Selection) => void) {
@@ -23,8 +27,8 @@ function useOutsideClick(ref: RefObject.RefObject<HTMLDivElement>, setSelection:
     */
     useEffect(() => {
         function handleClickOutside(event: globalThis.MouseEvent) {
-            // note: clicking an textarea shouldn't de-focus, because when selecting a clue textarea the user needs to see which letters get highlighted
-            if (ref.current && !ref.current.contains(event.target as Node) && !(isTextBox(event.target))) {
+            // clicking certain elements shouldn't de-focus
+            if (ref.current && !ref.current.contains(event.target as Node) && !(isClickable(event.target))) {
                 // this just resets the selection/focus to nothing 
                 setSelection({
                     coordinate: Coordinate.NONE,

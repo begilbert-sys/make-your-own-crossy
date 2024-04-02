@@ -3,6 +3,8 @@ import wordBank from "@/data/wordbank.json";
 import { Coordinate } from "@/app/types/coordinate";
 import { Board } from "@/app/types/board";
 
+import { shuffleArray } from "@/app/lib/shuffle";
+
 /*
 =============================
 BINARY-FILTER UTILITY FUNCTIONS 
@@ -81,17 +83,6 @@ function binarySearchContains(binaryWordList: BinaryWord[], query: BinaryQuery) 
 WORD BANK PREP
 =============================
 */
-function shuffleArray(array: any[]) {
-    /* randomly shuffle an array. return a copy of the shuffled array */
-    const copyList = [...array];
-    for (let max = copyList.length - 1; max >= 0; max--) {
-        const randomIndex = Math.floor(Math.random() * (max + 1));
-        const val = copyList[randomIndex];
-        copyList[randomIndex] = copyList[max];
-        copyList[max] = val;
-    }
-    return copyList;
-}
 // a shuffled version of the word bank
 var shuffledWordBank = shuffleArray(wordBank);
 
@@ -145,12 +136,15 @@ used: Set<string>
     }
     const startCoord: Coordinate = acrossList[acrossListIndex];
     const binaryQuery = queryToBinary(board.getWord(startCoord, "horizontal"));
+    if (!binaryQuery.query.includes(' ')) {
+        return true;
+    }
     const candidateList = shuffledSplitBank[binaryQuery.query.length - 3];
     for (let i = 0; i < candidateList.length; i++) {
         const binaryWord = candidateList[i];
         if (matchesBinaryQuery(binaryWord, binaryQuery) && !used.has(binaryWord.word)) {
             used.add(binaryWord.word);
-            board.setWord(startCoord, "horizontal", binaryWord.word);
+            board.setAutofillWord(startCoord, "horizontal", binaryWord.word);
             if (checkDownWords(board, downList) && recur(board, acrossList, downList, acrossListIndex + 1, used)) {
                 return true;
             }

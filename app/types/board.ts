@@ -1,13 +1,16 @@
 import { Coordinate } from "@/app/types/coordinate";
 import { Selection, Direction } from "@/app/types/selection";
 
+/* 
+contains all of the characters on the board 
+auto-generated characters are suffixed with a "!"
+*/ 
 export class Board {
     private board: string[][]
     rows: number
     columns: number
 
     constructor(rows: number, columns: number, oldBoard?: Board) {
-
         this.rows = rows;
         this.columns = columns;
         if (oldBoard) {
@@ -37,14 +40,11 @@ export class Board {
     }
 
     private verifyValue(value: string){
-        const pattern = /^[a-z \.]$/
+        const pattern = /^[a-z \.]!?$/
         return pattern.test(value);
     }
 
     set(row: number, column: number, value: string): void {
-        if (!this.verifyValue(value)) {
-            throw new Error("\"" + value + "\"is not a valid value");
-        }
         this.board[row][column] = value;
     }
     setCoord(coord: Coordinate, value: string) {
@@ -89,39 +89,61 @@ export class Board {
 
     getWord(startCoord: Coordinate, direction: Direction): string {
         let result = "";
-        let currentCoord = startCoord;
+        // this method needs to be optimized so it uses numbers instead of Coordinate objects 
+        let currentRow = startCoord.row;
+        let currentColumn = startCoord.column;
         while (true) {
-            const char = this.getCoord(currentCoord);
+            const char = this.get(currentRow, currentColumn)[0];
             if (char === '.') {
                 return result;
             }
-            result += this.getCoord(currentCoord);
+            result += char;
             if (direction === "horizontal") {
-                if (currentCoord.column >= this.columns - 1) {
+                if (currentColumn >= this.columns - 1) {
                     return result;
                 }
-                currentCoord = new Coordinate(currentCoord.row, currentCoord.column + 1);
+                currentColumn++;
             }
             else {
-                if (currentCoord.row >= this.rows - 1) {
+                if (currentRow >= this.rows - 1) {
                     return result;
                 }
-                currentCoord = new Coordinate(currentCoord.row + 1, currentCoord.column);
+                currentRow++;
             }
         }
     }
 
     setWord(startCoord: Coordinate, direction: Direction, word: string): void {
-        let currentCoord = startCoord;
+        let currentRow = startCoord.row;
+        let currentColumn = startCoord.column;
         for (let i = 0; i < word.length; i++) {
-            if (this.getCoord(currentCoord) == '.') {
+            if (this.get(currentRow, currentColumn) == '.') {
                 throw new Error("word \"" + word + "\" does not fit at (" + startCoord.row + ", " + startCoord.column + ")");
             }
-            this.setCoord(currentCoord, word[i]);
+            this.set(currentRow, currentColumn, word[i]);
             if (direction === 'horizontal') {
-                currentCoord = new Coordinate(currentCoord.row, currentCoord.column + 1);
+                currentColumn++;
             } else {
-                currentCoord = new Coordinate(currentCoord.row + 1, currentCoord.column);
+                currentRow++;
+            }
+        }
+    }
+    setAutofillWord(startCoord: Coordinate, direction: Direction, word: string): void {
+        let currentRow = startCoord.row;
+        let currentColumn = startCoord.column;
+        for (let i = 0; i < word.length; i++) {
+            const currentSquare = this.get(currentRow, currentColumn);
+            if (currentSquare == '.') {
+                throw new Error("word \"" + word + "\" does not fit at (" + startCoord.row + ", " + startCoord.column + ")");
+            }
+            else if (currentSquare.length == 1 && currentSquare != ' ') {
+                continue;
+            }
+            this.set(currentRow, currentColumn, word[i] + '!');
+            if (direction === 'horizontal') {
+                currentColumn++;
+            } else {
+                currentRow++;
             }
         }
     }

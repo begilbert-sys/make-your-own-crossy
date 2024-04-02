@@ -8,9 +8,6 @@ export class Coordinate {
         Object.freeze(this); // makes the object immutable
     }
     equals(other: Coordinate): boolean {
-        if (this == Coordinate.NONE || other == Coordinate.NONE) {
-            return false;
-        }
         return this.row === other.row && this.column === other.column;
     }
 }
