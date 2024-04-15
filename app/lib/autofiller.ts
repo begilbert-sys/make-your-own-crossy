@@ -2,9 +2,12 @@ import wordBank from "@/data/wordbank.json";
 
 import { Coordinate } from "@/app/types/coordinate";
 import { Board } from "@/app/types/board";
+import { Direction } from "@/app/types/selection";
 
 import { shuffleArray } from "@/app/lib/shuffle";
+import { Truculenta } from "next/font/google";
 
+var iter = 0;
 /*
 =============================
 BINARY-FILTER UTILITY FUNCTIONS 
@@ -36,7 +39,7 @@ function wordToBinary(word: string): BinaryWord {
 function queryToBinary(query: string): BinaryQuery {
     /* convert a query to a BinaryQuery object containing its binary value AND filter value */
     const ordinalOffset = 96;
-    let num = 0; 
+    let num = 0;
     let filter = 0;
     for (let i = 0; i < query.length; i++) {
         const letter = query[i];
@@ -55,7 +58,8 @@ function matchesBinaryQuery(word: BinaryWord, query: BinaryQuery): boolean {
     return (word.value & query.filter) === query.value;
 }
 
-function binarySearchContains(binaryWordList: BinaryWord[], query: BinaryQuery) {
+function binarySearchContains(binaryWordList: BinaryWord[], query: BinaryQuery): boolean {
+    iter++;
     /* return whether or not the list contains a word matching the query
     implements the standard binary search algorithm */
     let low = 0;
@@ -109,11 +113,11 @@ ALGORITHM
 =============================
 */
 
-function checkDownWords(board: Board, downList: Coordinate[]): boolean {
+function checkWords(board: Board, wordList: Coordinate[], direction: Direction): boolean {
     /* iterate through the board's down words and ensure all are valid */
-    for (let i = 0; i < downList.length; i++) {
-        const startCoord = downList[i];
-        const binaryQuery = queryToBinary(board.getWord(startCoord, "vertical"));
+    for (let i = 0; i < wordList.length; i++) {
+        const startCoord = wordList[i];
+        const binaryQuery = queryToBinary(board.getWord(startCoord, direction));
         const candidateList = sortedSplitBank[binaryQuery.query.length - 3];
         if (!binarySearchContains(candidateList, binaryQuery)) {
             return false;
@@ -122,42 +126,51 @@ function checkDownWords(board: Board, downList: Coordinate[]): boolean {
     return true;
 }
 
+var alphabet = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z'];
 
+function nextSquare(board: Board, coord: Coordinate): Coordinate {
+    if (coord.column === board.columns - 1) {
+        return new Coordinate(coord.row + 1, 0);
+    }
+    return new Coordinate(coord.row, coord.column + 1);
+}
 function recur(
 board: Board,
 acrossList: Coordinate[],
+acrossIndices: number[][],
 downList: Coordinate[],
-acrossListIndex: number,
-used: Set<string>
+downIndices: number[][],
+coord: Coordinate
 ): boolean {
-    console.log(used);
-    if (acrossListIndex >= acrossList.length) {
-        return true;
+    //console.log(coord);
+    let final = (coord.row === board.rows - 1 && coord.column === board.columns - 1);
+    const currentSquare = board.getCoord(coord);
+    if (currentSquare !== ' ') {
+        if (final) {
+            return true;
+        }
+        return recur(board, acrossList, acrossIndices, downList, downIndices, nextSquare(board, coord));
     }
-    const startCoord: Coordinate = acrossList[acrossListIndex];
-    const binaryQuery = queryToBinary(board.getWord(startCoord, "horizontal"));
-    if (!binaryQuery.query.includes(' ')) {
-        return true;
-    }
-    const candidateList = shuffledSplitBank[binaryQuery.query.length - 3];
-    for (let i = 0; i < candidateList.length; i++) {
-        const binaryWord = candidateList[i];
-        if (matchesBinaryQuery(binaryWord, binaryQuery) && !used.has(binaryWord.word)) {
-            used.add(binaryWord.word);
-            board.setAutofillWord(startCoord, "horizontal", binaryWord.word);
-            if (checkDownWords(board, downList) && recur(board, acrossList, downList, acrossListIndex + 1, used)) {
+    const letterOffset = Math.floor(Math.random() * 26);
+    for (let i = 0; i < 26; i++) {
+        board.setCoord(coord, alphabet.at(i - letterOffset)!);
+        if (checkWords(board, [acrossList[acrossIndices[coord.row][coord.column]]], "horizontal") && checkWords(board, [downList[downIndices[coord.row][coord.column]]], "vertical")) {
+            if (final || recur(board, acrossList, acrossIndices, downList, downIndices, nextSquare(board, coord))) {
                 return true;
             }
-            used.delete(binaryWord.word);
         }
     }
-    board.setWord(startCoord, "horizontal", binaryQuery.query);
+    board.setCoord(coord, ' ');
     return false;
 }
 
 export default function autoFiller(board: Board) {
+    const startTime = new Date().getTime();
     const boardCopy = new Board(board.rows, board.columns, board);
-    if (recur(boardCopy, board.getAcrossList(), board.getDownList(), 0, new Set<string>)) {
+    if (recur(boardCopy, board.getAcrossList(), board.mapAcrossIndices(), board.getDownList(), board.mapDownIndices(),new Coordinate(0, 0))) {
+        const endTime = new Date().getTime();
+        const executionTime: number = endTime - startTime;
+        console.log(`Function hit ${iter/executionTime} iters per second`)
         return boardCopy;
     }
     console.log("failed");

@@ -34,7 +34,7 @@ export default function Tools() {
                     </div>
                 </li>
                 <li>
-                    Disable/Enable a Cell <div className={styles.keyboardKeyWrapper}><div className={styles.keyboardKey}>.</div></div>
+                    Blackout a Cell <div className={styles.keyboardKeyWrapper}><div className={styles.keyboardKey}>.</div></div>
                 </li>
                 <li>
                     Jump to next word <div className={styles.keyboardKeyWrapper}><div className={styles.keyboardKey}>Enter</div></div>

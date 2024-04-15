@@ -7,6 +7,7 @@ import { BoardContext, IBoardContext } from "@/app/contexts/boardcontext";
 export default function AutoFill() {
     const {board, setBoard} = useContext<IBoardContext>(BoardContext);
     const handleClick = () => {
+        board.clearAutofill();
         const newBoard = autoFiller(board);
         setBoard(newBoard);
     }

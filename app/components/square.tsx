@@ -1,14 +1,12 @@
 import { KeyboardEvent, useRef, useContext } from 'react';
 
-import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward';
-import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import clsx from 'clsx';
 
 import styles from '@/styles/Home.module.css';
 
 import { Coordinate } from '@/app/types/coordinate';
 import { Board } from '@/app/types/board';
-import { Selection } from '@/app/types/selection';
+import { Selection, Direction } from '@/app/types/selection';
 
 import { BoardContext, IBoardContext } from '@/app/contexts/boardcontext';
 import { SelectionContext, ISelectionContext } from '@/app/contexts/selectioncontext';
@@ -46,20 +44,27 @@ function getPrevSquare(coords: Coordinate, selection: Selection, rows: number, c
 interface ISquareProps {
     coords: Coordinate,
     highlighted: boolean,
-    nextWord?: Coordinate,
+    acrossList: Coordinate[],
+    acrossIndex: number,
+    downList: Coordinate[],
+    downIndex: number,
     cornerValue?: number,
 }
-export default function Square({coords, highlighted, nextWord, cornerValue} : ISquareProps) {
+export default function Square({coords, highlighted, acrossIndex, downIndex, cornerValue} : ISquareProps) {
     const {selection, setSelection} = useContext<ISelectionContext>(SelectionContext);
     const {board, setBoard} = useContext<IBoardContext>(BoardContext);
-    
+
+    const acrossList = board.getAcrossList();
+    const downList = board.getDownList();
+
     const inputRef = useRef<HTMLInputElement>(null);
     if (inputRef.current != null && selection.focus && coords.equals(selection.coordinate)) {
         inputRef.current.focus();
     }
     
     const char: string = board.getCoord(coords)[0];
-    const autofilled = board.getCoord(coords).length == 2;
+    // if a square's contents is length 2 then it's been autofilled
+    const autofilled = board.getCoord(coords).length === 2;
     const disabled = char === '.';
     const setChar = (newChar: string) => {
         let newBoard = new Board(board.rows, board.columns, board);
@@ -83,16 +88,53 @@ export default function Square({coords, highlighted, nextWord, cornerValue} : IS
             case "Backspace":
                 /* delete square value and move one square back */
                 setChar(' ');
-                modifiedSelection.coordinate = getPrevSquare(coords,selection, board.rows, board.columns);
+                modifiedSelection.coordinate = getPrevSquare(coords, selection, board.rows, board.columns);
                 break;
 
             case "Enter":
+            case "Tab":
                 /* jump to the next word */
-                if (nextWord) {
-                    modifiedSelection.coordinate = nextWord;
+                if (selection.direction === "horizontal") {
+                    if (acrossIndex < acrossList.length - 1) {
+                        modifiedSelection.coordinate = acrossList[acrossIndex + 1];
+                    } else {
+                        modifiedSelection.coordinate = downList[0];
+                        modifiedSelection.direction = "vertical";
+                    }
+                } else {
+                    if (downIndex < downList.length - 1) {
+                        modifiedSelection.coordinate = downList[downIndex + 1];
+                    } else {
+                        modifiedSelection.coordinate = acrossList[0];
+                        modifiedSelection.direction = "horizontal";
+                    } 
                 }
                 break;
-
+            case ' ':
+                if (selection.direction === "horizontal") {
+                    if (acrossIndex === -1) {
+                        break;
+                    }
+                    else if (selection.coordinate.column === board.columns - 1 || board.get(selection.coordinate.row, selection.coordinate.column + 1) === '.') {
+                        console.log(acrossIndex);
+                        console.log(acrossList[acrossIndex]);
+                        modifiedSelection.coordinate = acrossList[acrossIndex];
+                    }
+                    else {
+                        modifiedSelection.coordinate = getNextSquare(coords, selection, board.rows, board.columns);
+                    }
+                } else {
+                    if (downIndex === -1) {
+                        break;
+                    }
+                    else if (selection.coordinate.row === board.rows - 1 || board.get(selection.coordinate.row + 1, selection.coordinate.column) === '.') {
+                        modifiedSelection.coordinate = downList[downIndex];
+                    }
+                    else {
+                        modifiedSelection.coordinate = getNextSquare(coords, selection, board.rows, board.columns);
+                    }
+                }
+                break;
             case '.':
                 if (disabled) {
                     setChar(' ');
@@ -158,15 +200,8 @@ export default function Square({coords, highlighted, nextWord, cornerValue} : IS
         setSelection(modifiedSelection);
     }
 
-    let floatingArrow;
-    if (coords.equals(selection.coordinate)) {
-        const arrowIcon = (selection.direction === "horizontal" ? 
-        <ArrowForwardIcon fontSize="inherit"/> : <ArrowDownwardIcon fontSize="inherit"/>);
-        floatingArrow = <div className={styles.floatingArrow} onClick = {handleClick} >{arrowIcon}</div>;
-    }
     return (
     <div style={{ "--board-size": getMaxBoardSize(board) } as React.CSSProperties}>
-        {floatingArrow}
         <div className = {styles.cornerValue}>{cornerValue}</div>
         <input
             ref = {inputRef}

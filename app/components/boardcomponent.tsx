@@ -4,7 +4,7 @@ import RefObject, { useEffect, useRef, useContext } from 'react';
 import styles from '@/styles/Home.module.css';
 import { Coordinate } from '@/app/types/coordinate';
 import { Board } from '@/app/types/board';
-import { Selection } from '@/app/types/selection';
+import { Selection, Direction } from '@/app/types/selection';
 
 import { BoardContext, IBoardContext } from '@/app/contexts/boardcontext';
 import { SelectionContext, ISelectionContext } from '@/app/contexts/selectioncontext';
@@ -56,38 +56,31 @@ export default function BoardComponent() {
 
     const boardArray = [];
     const selectedWordCoords = board.getSelectionWord(selection);
-
-    let acrossList = board.getAcrossList().reverse();
-    let downList = board.getDownList().reverse();
+    const acrossList = board.getAcrossList();
+    const downList = board.getDownList();
+    let reverseAcrossList = [...acrossList].reverse();
+    let reverseDownList = [...downList].reverse();
     let cornerValue = 0;
     let highlight = false;
+    const acrossIndices: number[][] = board.mapAcrossIndices();
+    const downIndices: number[][] = board.mapDownIndices();
     for (let row = 0; row < board.rows; row++){
         let rowArray = []
         for (let col = 0; col < board.columns; col++) {
             const coords = new Coordinate(row, col);
             // get the cornerValue if applicable 
             let hasCornerValue = false;
-            if (acrossList.length > 0 && coords.equals(acrossList.at(-1)!)) {
+            if (reverseAcrossList.length > 0 && coords.equals(reverseAcrossList.at(-1)!)) {
                 hasCornerValue = true;
                 cornerValue++;
-                acrossList.pop();
+                reverseAcrossList.pop();
             }
-            if (downList.length > 0 && coords.equals(downList.at(-1)!)) {
+            if (reverseDownList.length > 0 && coords.equals(reverseDownList.at(-1)!)) {
                 if (!hasCornerValue) {
                     hasCornerValue = true;
                     cornerValue++;
                 }
-                downList.pop();
-            }
-            let nextWord;
-            if (selection.direction == "horizontal") {
-                if (acrossList.length > 0) {
-                    nextWord = acrossList.at(-1);
-                }
-            } else {
-                if (downList.length > 0) {
-                    nextWord = downList.at(-1);
-                }
+                reverseDownList.pop();
             }
             if (selectedWordCoords != null && coords.equals(selectedWordCoords)) {
                 highlight = true;
@@ -101,7 +94,10 @@ export default function BoardComponent() {
                     key = {col}
                     coords = {coords}
                     highlighted = {shouldHighlight}
-                    nextWord = {nextWord}
+                    acrossList = {acrossList}
+                    acrossIndex = {acrossIndices[coords.row][coords.column]}
+                    downList = {downList}
+                    downIndex = {downIndices[coords.row][coords.column]}
                     cornerValue = {hasCornerValue ? cornerValue : undefined}
                 />
             )

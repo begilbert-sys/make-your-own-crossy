@@ -64,7 +64,7 @@ export class Board {
             for (let col = 0; col < this.columns; col++) {
                 if (this.board[row][col] !== '.' // space is not blank  
                 && (col === 0 || this.board[row][col-1] === '.')
-                && (col + 2 < this.columns && this.board[row][col+1] != '.' && this.board[row][col+2] != '.')) {
+                && (col + 2 < this.columns && this.board[row][col+1] !== '.' && this.board[row][col+2] !== '.')) {
                     acrossList.push(new Coordinate(row, col));
                 }
             }
@@ -148,6 +148,29 @@ export class Board {
         }
     }
 
+    clearAutofill(): void {
+        console.log("entered clearautofill");
+        for (let row = 0; row < this.rows; row++) {
+            for (let col = 0; col < this.columns; col++) {
+                const char = this.get(row, col);
+                if (char.length == 2) {
+                    this.set(row, col, ' ');
+                }
+            }
+        }
+    }
+
+    acceptAutofill(): void {
+        for (let row = 0; row < this.rows; row++) {
+            for (let col = 0; col < this.columns; col++) {
+                const char = this.get(row, col);
+                if (char.length == 2) {
+                    this.set(row, col, char[0]);
+                }
+            }
+        }
+    }
+
     getSelectionWord(selection: Selection): Coordinate {
         /* Get the coordinate of the first letter of the selected word  */
         let wordList: Coordinate[] = (
@@ -176,5 +199,40 @@ export class Board {
             }
         }
         return Coordinate.NONE;
+    }
+
+    mapAcrossIndices(): number[][] {
+        let reverseAcrossList = this.getAcrossList().reverse();
+        let result = [];
+        let currentIndex = -1;
+        for (let row = 0; row < this.rows; row++) {
+            let indexRow = [];
+            for (let col = 0; col < this.columns; col++) {
+                const coord = new Coordinate(row, col);
+                if (this.getCoord(coord) === '.') {
+                    indexRow.push(-1);
+                    continue;
+                }
+                if (reverseAcrossList.length > 0 && coord.equals(reverseAcrossList.at(-1)!)) {
+                    reverseAcrossList.pop();
+                    currentIndex++;
+                }
+                indexRow.push(currentIndex);
+            }
+            result.push(indexRow);
+        }
+        return result;
+    }
+    mapDownIndices(): number[][] {
+        let downList = this.getDownList();
+        let result = [...Array(this.rows)].map(() => Array(this.columns).fill(-1));
+        for (let i = 0; i < downList.length; i++) {
+            let currentRow = downList[i].row;
+            const column = downList[i].column;
+            while (currentRow < this.rows && this.get(currentRow, column) !== '.') {
+                result[currentRow++][column] = i;
+            }
+        }
+        return result;
     }
 }
