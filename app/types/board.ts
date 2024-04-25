@@ -57,6 +57,17 @@ export class Board {
         return this.get(coord.row, coord.column);
     }
 
+    toString(): string {
+        let result = "";
+        for (let row = 0; row < this.rows; row++) {
+            for (let col = 0; col < this.columns; col++) {
+                result += this.get(row, col);
+            }
+            result += '\n';
+        }
+        return result;
+    }
+
     getAcrossList(): Coordinate[] {
         /* Get a list of all coordinates that should be marked with a horizontal ("across") corner value */
         let acrossList = [];

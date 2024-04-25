@@ -5,7 +5,6 @@ import { Board } from "@/app/types/board";
 import { Direction } from "@/app/types/selection";
 
 import { shuffleArray } from "@/app/lib/shuffle";
-import { Truculenta } from "next/font/google";
 
 var iter = 0;
 /*

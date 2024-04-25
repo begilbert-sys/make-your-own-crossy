@@ -16,6 +16,7 @@ import WordFinder from "@/app/components/wordfinder";
 import AutoFill from "@/app/components/autofill";
 import Tools from "@/app/components/tools";
 import ClearBoard from '@/app/components/clearboard';
+import Upload from '@/app/components/upload';
 
 
 export default function CrossyBuilder() { 
@@ -43,9 +44,10 @@ export default function CrossyBuilder() {
                         <hr/>
                         <AutoFill />
                     </div>
-                    <div className={styles.thing}>
-                    <BoardComponent />
-                    <ClearBoard />
+                    <div className={styles.boardCenterWrapper}>
+                        <BoardComponent />
+                        <ClearBoard />
+                        <Upload/>
                     </div>
                     <Clues />
                 </BoardContext.Provider>

@@ -10,8 +10,8 @@ import styles from '@/styles/Home.module.css';
 
 import { Coordinate } from "@/app/types/coordinate";
 
-import {SelectionContext, ISelectionContext} from '@/app/contexts/selectioncontext';
-import {BoardContext, IBoardContext} from '@/app/contexts/boardcontext';
+import { SelectionContext, ISelectionContext } from '@/app/contexts/selectioncontext';
+import { BoardContext, IBoardContext } from '@/app/contexts/boardcontext';
 
 import { shuffleArray } from "@/app/lib/shuffle";
 
