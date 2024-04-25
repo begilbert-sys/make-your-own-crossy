@@ -17,6 +17,7 @@ export default function Upload() {
         });
         const hexID = await res.text();
         router.push("/mini/" + hexID);
+        
     }
 
     const {board, setBoard} = useContext<IBoardContext>(BoardContext);
