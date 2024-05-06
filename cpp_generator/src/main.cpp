@@ -1,43 +1,51 @@
 #include <iostream>
 #include <string>
-#include <chrono>
+#include <filesystem>
 
 #include "solver.h"
 #include "matrix.h"
 #include "fixedtrie.h"
 #include "board.h"
-#include "randutil.h"
+#include "utils/randutil.h"
 
 
 using namespace std;
-// g++ -g -Wall -Wextra main.cpp fixedtrie.cpp solver.cpp strutil.cpp board.cpp; ./a.exe
 
-const std::string DIRECTORY = "/Users/bengilbert/Documents/Mini Crossword Generator/data/";
 
-void run() {
-    srand((unsigned) time(NULL));
-    auto start = chrono::high_resolution_clock::now();
-    Solver solver(DIRECTORY + "words.txt");
-    Board board(DIRECTORY + "board.txt");
-    
-    auto end = chrono::high_resolution_clock::now();
-    auto duration = chrono::duration_cast<chrono::milliseconds>(end - start);
-    //cout << "Overhead: " << duration.count() << "ms" << endl;
-    start = chrono::high_resolution_clock::now();
+/*
+To call this C++ function from Javascript via wasm, emscripten requires it to be a "C style" function.
+This means it must accept and return C-style strings (char*).
+ 
+Note the absence of a free() call - this is because the memory
+for the returned string is dallocated using Javascript!
+*/
+
+const string DIRECTORY = filesystem::current_path().string();
+
+extern "C" {
+
+char* solve(char* board_string) {
+    Solver solver(DIRECTORY + "/data/words.txt");
+    Board board(board_string);
     solver.solve(board);
-    end = chrono::high_resolution_clock::now();
-    duration = chrono::duration_cast<chrono::milliseconds>(end - start);
-    board.display();
-    cout << "Elapsed time: " << duration.count() << "ms" << endl;
+    char* board_result = (char*)malloc(strlen(board_string) * sizeof(char));
+    int index = 0;
+    for (int row = 0; row < board.rows; row++) {
+        for (int col = 0; col < board.columns; col++) {
+            board_result[index++] = board.get({row, col});
+        }
+        board_result[index++] = '\n';
+    }
+    return board_result;
+    
+}
+
 }
 
 int main() {
-    try {
-        run();
-        cout << "Program exited successfully" << endl;
-        return EXIT_SUCCESS;
-    } catch (const exception& e) {
-        cerr << "AN ERROR OCCURRED:\n" << e.what() << endl;
-        return EXIT_FAILURE;
-    }
+    char* board_string = (char*)"_____\n_____\n_____\n_____\n_____";
+    char* result = solve(board_string);
+    cout << result << endl;
+    free(result);
+    return 0;
 }

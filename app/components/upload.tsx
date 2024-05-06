@@ -10,7 +10,7 @@ import { BoardContext, IBoardContext } from '@/app/contexts/boardcontext';
 export default function Upload() {
     const router = useRouter();
     const uploadBoard = async (board: Board) => {
-        const res = await fetch("api/", {
+        const res = await fetch(process.env.WEBSITE_URL + "api/", {
             method: "POST",
             headers: { "Content-Type" : "text/plain" },
             body: board.toString()

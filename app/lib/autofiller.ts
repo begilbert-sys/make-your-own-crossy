@@ -165,7 +165,7 @@ coord: Coordinate
 
 export default function autoFiller(board: Board) {
     const startTime = new Date().getTime();
-    const boardCopy = new Board(board.rows, board.columns, board);
+    const boardCopy = new Board({rows: board.rows, columns: board.columns, oldBoard: board});
     if (recur(boardCopy, board.getAcrossList(), board.mapAcrossIndices(), board.getDownList(), board.mapDownIndices(),new Coordinate(0, 0))) {
         const endTime = new Date().getTime();
         const executionTime: number = endTime - startTime;

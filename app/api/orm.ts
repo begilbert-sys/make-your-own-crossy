@@ -22,13 +22,13 @@ function getHexID(dbID: number, dbRand: number): string {
     return bigIntID.toString(16);
 }
 
-export async function add_mini(boardString : string): Promise<string | null> {
+export async function add_mini(boardString : string): Promise<string> {
     const result = await sql.file(querydir + 'insert.sql', [boardString]) as DBMiniRow[];
     return getHexID(result[0].id, result[0].rand);
 }
 
-export async function get_mini(hexID: string): Promise<DBMiniRow[]> {
+export async function get_mini(hexID: string): Promise<string> {
     const [dbID, dbRand] = getDBIds(hexID);
     const result = await sql.file(querydir + 'select.sql', [dbID, dbRand]) as DBMiniRow[];
-    return result;
+    return result[0].content;
 }

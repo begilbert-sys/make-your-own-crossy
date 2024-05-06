@@ -5,20 +5,43 @@ import { Selection, Direction } from "@/app/types/selection";
 contains all of the characters on the board 
 auto-generated characters are suffixed with a "!"
 */ 
+
+
+type params = {rows: number, columns: number, oldBoard?: Board} | string;
+
 export class Board {
     private board: string[][]
     rows: number
     columns: number
 
-    constructor(rows: number, columns: number, oldBoard?: Board) {
-        this.rows = rows;
-        this.columns = columns;
-        if (oldBoard) {
+    constructor(params: params) {
+        if (typeof params === "string") {
+            this.board = [];
+            const boardRows = params.split('\n');
+            this.rows = boardRows.length;
+            this.columns = boardRows[0].length;
+            for (let row = 0; row < this.rows; row++) {
+                const rowStr = boardRows[row];
+                let newRow = [];
+                if (rowStr.length !== this.rows) {
+                    throw new Error(`row "${rowStr}" must be length ${this.rows}`);
+                }
+                for (let col = 0; col < this.columns; col++) {
+                    const char = boardRows[row][col]
+                    this.verifyChar(char);
+                    newRow.push(char);
+                }
+                this.board.push(newRow);
+            }
+        } else {
+            const {rows, columns, oldBoard} = params;
+            this.rows = rows;
+            this.columns = columns;
             this.board = [];
             for (let row = 0; row < rows; row++) {
                 let newRow = [];
                 for (let col = 0; col < columns; col++) {
-                    if (row < oldBoard.rows && col < oldBoard.columns) {
+                    if (oldBoard && row < oldBoard.rows && col < oldBoard.columns) {
                         newRow.push(oldBoard.get(row, col));  
                     } else {
                         newRow.push(' ');
@@ -27,21 +50,13 @@ export class Board {
                 this.board.push(newRow);
             }
         }
-        else {
-            this.board = [];
-            for (let row = 0; row < rows; row++) {
-                let newRow = [];
-                for (let col = 0; col < columns; col++) {
-                    newRow.push(' ');
-                }
-                this.board.push(newRow);
-            }
-        }
     }
 
-    private verifyValue(value: string){
-        const pattern = /^[a-z \.]!?$/
-        return pattern.test(value);
+    private verifyChar(char: string) {
+        const pattern = /^[a-z \.]$/
+        if (!pattern.test(char)) {
+            throw new Error(`char: "${char}" is invalid`);
+        }
     }
 
     set(row: number, column: number, value: string): void {
