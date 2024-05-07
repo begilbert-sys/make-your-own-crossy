@@ -22,13 +22,14 @@ export class Board {
     constructor(params: params) {
         if (typeof params === "string") {
             this.board = [];
-            const boardRows = params.split('\n');
+            const boardRows = params.split('\n').filter((row) => row !== '');
+            console.log(boardRows);
             this.rows = boardRows.length;
             this.columns = boardRows[0].length;
             for (let row = 0; row < this.rows; row++) {
                 const rowStr = boardRows[row];
                 let newRow = [];
-                if (rowStr.length !== this.rows) {
+                if (rowStr.length !== this.columns) {
                     throw new Error(`row "${rowStr}" must be length ${this.rows}`);
                 }
                 for (let col = 0; col < this.columns; col++) {
@@ -81,7 +82,12 @@ export class Board {
         let result = "";
         for (let row = 0; row < this.rows; row++) {
             for (let col = 0; col < this.columns; col++) {
-                result += this.get(row, col);
+                const char = this.get(row, col);
+                if (char === ' ') {
+                    result += '_';
+                } else {
+                    result += this.get(row, col);
+                }
             }
             result += '\n';
         }

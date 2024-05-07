@@ -10,7 +10,8 @@ import { BoardContext, IBoardContext } from "@/app/contexts/boardcontext";
 export default function AutoFill() {
     const {board, setBoard} = useContext<IBoardContext>(BoardContext);
     const handleClick = async () => {
-        await generateBoard();
+        const newBoard = await generateBoard(board);
+        setBoard(newBoard);
     };
     
     return (

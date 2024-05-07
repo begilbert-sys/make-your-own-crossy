@@ -1,9 +1,7 @@
 # emscripten Makefile
-# yes I know this Makefile sucks 
+# yes this Makefile sucks 
 
 # flag explanations:
-# -O3: Optimization level 3
-
 # -sSINGLE_FILE=1: embeds the compiled WASM into the generated .js file. this way I don't need to load a seperate .wasm file 
 # -sENVIRONMENT=web: emits code that only runs on the web
 # -sMODULARIZE=1: makes the .js code importable as a module
@@ -15,7 +13,7 @@ outdir := ./out
 
 OBJECTS := $(outdir)/strutil.o $(outdir)/randutil.o $(outdir)/fixedtrie.o $(outdir)/board.o $(outdir)/solver.o
 
-main: $(outdir)/main.o
+generator.js: $(outdir)/main.o
 	em++ $(FLAGS) $(outdir)/main.o $(OBJECTS) -o generator.js $(EMFLAGS)
 
 $(outdir)/main.o: $(srcdir)/main.cpp $(OBJECTS)
@@ -35,4 +33,4 @@ $(outdir):
 clean: 
 	rm -rf $(outdir)
 	rm generator.js
-	rm main.data
+	rm generator.data

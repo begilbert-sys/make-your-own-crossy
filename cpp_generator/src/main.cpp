@@ -27,7 +27,8 @@ char* solve(char* board_string) {
     Solver solver(DIRECTORY + "/data/words.txt");
     Board board(board_string);
     solver.solve(board);
-    char* board_result = (char*)malloc(strlen(board_string) * sizeof(char));
+    int board_length = strlen(board_string);
+    char* board_result = (char*)malloc(board_length + 1 * sizeof(char));
     int index = 0;
     for (int row = 0; row < board.rows; row++) {
         for (int col = 0; col < board.columns; col++) {
@@ -35,6 +36,8 @@ char* solve(char* board_string) {
         }
         board_result[index++] = '\n';
     }
+    // terminate the string 
+    board_result[board_length] = '\0';
     free(board_string);
     return board_result;
     

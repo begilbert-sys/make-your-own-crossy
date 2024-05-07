@@ -5,6 +5,7 @@
 #include <string>
 #include <unordered_map>
 #include <vector>
+#include <cctype>
 
 #include "matrix.h"
 #include "utils/strutil.h"

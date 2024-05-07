@@ -39,9 +39,6 @@ void Board::build_words(bool is_across) {
         }
     }
     if (!current_string.empty()) {
-        if (!strutil::contains(current_string, BLANK)) {
-            current_string = strutil::toupper(current_string);
-        }
         if (is_across) {
             across_words[current_coord] = current_string;
         } else {
@@ -69,7 +66,7 @@ Board::Board(std::string board_string) {
                 break;
 
             default:
-                if (!islower(c)) {
+                if (!(std::islower(c))) {
                     throw new std::logic_error(std::string("\"") + c + "\" is not a valid letter");
                 }
                 rowstr += c;
