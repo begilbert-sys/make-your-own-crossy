@@ -20,7 +20,7 @@ import Upload from '@/app/components/upload';
 
 
 export default function CrossyBuilder() { 
-    const [board, setBoard] = useState<Board>(new Board(5, 5)); // board starts as 5x5 by default  
+    const [board, setBoard] = useState<Board>(new Board({rows: 5, columns: 5})); // board starts as 5x5 by default  
 
     const [selection, setSelection] = useState<Selection>({
         coordinate: Coordinate.NONE,

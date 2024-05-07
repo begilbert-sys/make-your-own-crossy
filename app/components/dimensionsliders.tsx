@@ -10,7 +10,7 @@ import { BoardContext, IBoardContext } from '@/app/contexts/boardcontext';
 export default function DimensionSliders() {
     const {board, setBoard} = useContext<IBoardContext>(BoardContext);
     const handleChangeBoardSize = (rows: number, columns: number) => {
-        setBoard(new Board(rows, columns, board));
+        setBoard(new Board({rows: rows, columns: columns, oldBoard: board}));
     }
     return (
         <div>

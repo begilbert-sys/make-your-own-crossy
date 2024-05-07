@@ -67,7 +67,7 @@ export default function Square({coords, highlighted, acrossIndex, downIndex, cor
     const autofilled = board.getCoord(coords).length === 2;
     const disabled = char === '.';
     const setChar = (newChar: string) => {
-        let newBoard = new Board(board.rows, board.columns, board);
+        let newBoard = new Board({rows: board.rows, columns: board.columns, oldBoard: board});
         newBoard.setCoord(coords, newChar);
         setBoard(newBoard);
     };

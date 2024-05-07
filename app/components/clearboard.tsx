@@ -15,7 +15,7 @@ export default function ClearBoard() {
     const {selection, setSelection} = useContext<ISelectionContext>(SelectionContext);
 
     const handleClick = () => {
-        const newBoard = new Board(board.rows, board.columns);
+        const newBoard = new Board({rows: board.rows, columns: board.columns});
         setBoard(newBoard);
         setSelection({
             coordinate: Coordinate.NONE,

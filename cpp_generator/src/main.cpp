@@ -16,8 +16,7 @@ using namespace std;
 To call this C++ function from Javascript via wasm, emscripten requires it to be a "C style" function.
 This means it must accept and return C-style strings (char*).
  
-Note the absence of a free() call - this is because the memory
-for the returned string is dallocated using Javascript!
+Note that the memory allocated for the returned string is actually deallocated on the Javascript side
 */
 
 const string DIRECTORY = filesystem::current_path().string();
@@ -36,16 +35,9 @@ char* solve(char* board_string) {
         }
         board_result[index++] = '\n';
     }
+    free(board_string);
     return board_result;
     
 }
 
-}
-
-int main() {
-    char* board_string = (char*)"_____\n_____\n_____\n_____\n_____";
-    char* result = solve(board_string);
-    cout << result << endl;
-    free(result);
-    return 0;
 }

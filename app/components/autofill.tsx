@@ -1,16 +1,17 @@
+import dynamic from 'next/dynamic';
 import { useContext } from 'react';
-import Button from '@mui/material/Button';
 
-import autoFiller from "@/app/lib/autofiller";
+import Button from '@mui/material/Button';
+import { generateBoard } from "@/app/lib/boardgen";
 
 import { BoardContext, IBoardContext } from "@/app/contexts/boardcontext";
+
+
 export default function AutoFill() {
     const {board, setBoard} = useContext<IBoardContext>(BoardContext);
-    const handleClick = () => {
-        board.clearAutofill();
-        const newBoard = autoFiller(board);
-        setBoard(newBoard);
-    }
+    const handleClick = async () => {
+        await generateBoard();
+    };
     
     return (
         <div>

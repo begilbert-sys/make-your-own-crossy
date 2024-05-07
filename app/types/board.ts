@@ -6,7 +6,12 @@ contains all of the characters on the board
 auto-generated characters are suffixed with a "!"
 */ 
 
-
+/* 
+Three paramater options for constructor a Board: 
+rows, columns - constructs a blank board of the specified size 
+rows, columns, oldBoard - copies an existing board
+string - initializes a board from a string 
+*/
 type params = {rows: number, columns: number, oldBoard?: Board} | string;
 
 export class Board {

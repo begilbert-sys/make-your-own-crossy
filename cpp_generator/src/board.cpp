@@ -64,7 +64,6 @@ Board::Board(std::string board_string) {
                 break;
 
             case '\n':
-                std::cout << rowstr << std::endl;
                 contents.push_back(rowstr);
                 rowstr = "";
                 break;

@@ -45,9 +45,6 @@ function useOutsideClick(ref: RefObject.RefObject<HTMLDivElement>, setSelection:
 
 }
 
-interface IBoardComponentProps {
-}
-
 export default function BoardComponent() {
     const {selection, setSelection} = useContext<ISelectionContext>(SelectionContext);
     const {board, setBoard} = useContext<IBoardContext>(BoardContext);
