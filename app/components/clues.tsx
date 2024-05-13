@@ -1,7 +1,7 @@
 import { useContext } from 'react';
 import styles from '@/styles/Home.module.css';
 
-import { Coordinate } from '@/app/types/coordinate';
+import { Coordinates } from '@/app/types/coordinate';
 
 import {SelectionContext, ISelectionContext} from '@/app/contexts/selectioncontext';
 import {BoardContext, IBoardContext} from '@/app/contexts/boardcontext';
@@ -13,22 +13,23 @@ export default function Clues() {
     const {selection, setSelection} = useContext<ISelectionContext>(SelectionContext);
     const {board, setBoard} = useContext<IBoardContext>(BoardContext);
 
-    let acrossList = board.getAcrossList().reverse();
-    let downList = board.getDownList().reverse();
-    const handleFocusAcross = (coords: Coordinate) => {
+
+    const handleFocusAcross = (coords: Coordinates) => {
         setSelection({
-            coordinate: coords,
-            direction: "horizontal",
+            coordinates: coords,
+            direction: "across",
             focus: false
         });
     }
-    const handleFocusDown = (coords: Coordinate) => {
+    const handleFocusDown = (coords: Coordinates) => {
         setSelection({
-            coordinate: coords,
-            direction: "vertical",
+            coordinates: coords,
+            direction: "down",
             focus: false
         });
     }
+
+    
     let clueListAcross = [];
     let clueListDown = [];
     let clueNumber = 0;

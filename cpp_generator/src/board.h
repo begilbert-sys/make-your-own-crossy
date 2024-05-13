@@ -15,6 +15,11 @@
 
 class Board {
     public:
+        enum Direction {
+            ACROSS,
+            DOWN
+        };
+    
         int rows;
         int columns;
         std::unordered_map<Coordinate, std::string> across_words;
@@ -35,7 +40,7 @@ class Board {
 
     private:
         Matrix<char>* boardptr;
-        void build_words(bool is_across);
+        void build_words(Direction direction);
 
 };
 

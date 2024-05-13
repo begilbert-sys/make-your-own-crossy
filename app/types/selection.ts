@@ -1,8 +1,8 @@
-import { Coordinate } from "@/app/types/coordinate";
-export type Direction = "horizontal" | "vertical";
+import { Coordinates } from '@/app/types/coordinate';
+import { Direction } from '@/app/types/board';
 
 export interface Selection {
-    coordinate: Coordinate,
+    coordinates: Coordinates,
     direction: Direction,
     focus: boolean
 }

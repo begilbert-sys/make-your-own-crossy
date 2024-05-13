@@ -24,6 +24,8 @@ const string DIRECTORY = filesystem::current_path().string();
 extern "C" {
 
 char* solve(char* board_string) {
+    srand((unsigned) time(NULL));
+    
     Solver solver(DIRECTORY + "/data/words.txt");
     Board board(board_string);
     solver.solve(board);

@@ -6,6 +6,6 @@ export interface IBoardContext {
     setBoard: (b: Board) => void
 };
 export const BoardContext = createContext<IBoardContext>({
-    board: new Board(5, 5), 
+    board: new Board({rows: 5, columns: 5}), 
     setBoard: (b: Board) => {}
 });

@@ -1,8 +1,8 @@
 'use client';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import styles from '@/styles/Home.module.css';
 
-import { Coordinate } from '@/app/types/coordinate';
+import { Coordinates } from '@/app/types/coordinate';
 import { Board } from '@/app/types/board';
 import { Selection } from '@/app/types/selection';
 
@@ -23,10 +23,11 @@ export default function CrossyBuilder() {
     const [board, setBoard] = useState<Board>(new Board({rows: 5, columns: 5})); // board starts as 5x5 by default  
 
     const [selection, setSelection] = useState<Selection>({
-        coordinate: Coordinate.NONE,
-        direction: "horizontal",
+        coordinates: Coordinates.NONE,
+        direction: "across",
         focus: false
     });
+
 
     return (
     <>
@@ -49,7 +50,6 @@ export default function CrossyBuilder() {
                         <ClearBoard />
                         <Upload/>
                     </div>
-                    <Clues />
                 </BoardContext.Provider>
             </SelectionContext.Provider>
         </div>

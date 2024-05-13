@@ -2,8 +2,7 @@ import { useContext } from 'react';
 
 import Button from '@mui/material/Button';
 
-import { Coordinate } from '@/app/types/coordinate';
-import { Selection } from '@/app/types/selection';
+import { Coordinates } from '@/app/types/coordinate';
 import { Board } from '@/app/types/board';
 
 import { ISelectionContext, SelectionContext } from '@/app/contexts/selectioncontext';
@@ -18,8 +17,8 @@ export default function ClearBoard() {
         const newBoard = new Board({rows: board.rows, columns: board.columns});
         setBoard(newBoard);
         setSelection({
-            coordinate: Coordinate.NONE,
-            direction: "horizontal",
+            coordinates: Coordinates.NONE,
+            direction: "across",
             focus: false
         });
     }

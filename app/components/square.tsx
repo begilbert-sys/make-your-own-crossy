@@ -1,212 +1,216 @@
-import { KeyboardEvent, useRef, useContext } from 'react';
+import { KeyboardEvent, useRef, useContext, useEffect } from 'react';
 
 import clsx from 'clsx';
 
 import styles from '@/styles/Home.module.css';
 
-import { Coordinate } from '@/app/types/coordinate';
+import { Coordinates } from '@/app/types/coordinate';
 import { Board } from '@/app/types/board';
-import { Selection, Direction } from '@/app/types/selection';
 
 import { BoardContext, IBoardContext } from '@/app/contexts/boardcontext';
 import { SelectionContext, ISelectionContext } from '@/app/contexts/selectioncontext';
 
-function getMaxBoardSize(board: Board) {
-    /* return max(rows, columns) */
-    return board.rows > board.columns ? board.rows : board.columns;
-}
-
-function getNextSquare(coords: Coordinate, selection: Selection, rows: number, columns: number): Coordinate {
-    const focusDirection = selection.direction;
-    // don't go anywhere if it's the last square on the board 
-    if (coords.row === rows - 1 && coords.column === columns - 1) {
-        return coords;
-    }
-    if (focusDirection === "horizontal") {
-        return coords.column === columns - 1 ? new Coordinate(coords.row + 1, 0) : new Coordinate(coords.row, coords.column + 1);
-    } else {
-        return coords.row === rows - 1 ? new Coordinate(0, coords.column + 1) : new Coordinate(coords.row + 1, coords.column);
-    }
-}
-function getPrevSquare(coords: Coordinate, selection: Selection, rows: number, columns: number): Coordinate {
-    const focusDirection = selection.direction;
-    // don't go anywhere if it's the last square on the board 
-    if (coords.row === 0 && coords.column === 0) {
-        return coords;
-    }
-    if (focusDirection === "horizontal") {
-        return coords.column === 0 ? new Coordinate(coords.row - 1, columns - 1) : new Coordinate(coords.row, coords.column - 1);
-    } else {
-        return coords.row === 0 ? new Coordinate(rows - 1, coords.column - 1) : new Coordinate(coords.row - 1, coords.column);
-    }
-}
-
-interface ISquareProps {
-    coords: Coordinate,
+interface SquareProps {
+    coords: Coordinates,
     highlighted: boolean,
-    acrossList: Coordinate[],
-    acrossIndex: number,
-    downList: Coordinate[],
-    downIndex: number,
-    cornerValue?: number,
+    cornerValue: string
 }
-export default function Square({coords, highlighted, acrossIndex, downIndex, cornerValue} : ISquareProps) {
+export default function Square({coords, highlighted, cornerValue} : SquareProps) {
+    /* 
+    variable initialization 
+    */
     const {selection, setSelection} = useContext<ISelectionContext>(SelectionContext);
     const {board, setBoard} = useContext<IBoardContext>(BoardContext);
-
-    const acrossList = board.getAcrossList();
-    const downList = board.getDownList();
-
     const inputRef = useRef<HTMLInputElement>(null);
-    if (inputRef.current != null && selection.focus && coords.equals(selection.coordinate)) {
+    if (inputRef.current != null && selection.focus && coords.equals(selection.coordinates)) {
         inputRef.current.focus();
     }
-    
-    const char: string = board.getCoord(coords)[0];
-    // if a square's contents is length 2 then it's been autofilled
-    const autofilled = board.getCoord(coords).length === 2;
-    const disabled = char === '.';
+
+    const acrossWordCoords = board.getWordStart(coords, "across");
+    const downWordCoords = board.getWordStart(coords, "down");
+
+    const acrossCoordsStrArray = Array.from(board.mapWordCoords("across").keys());
+    const downCoordsStrArray = Array.from(board.mapWordCoords("down").keys());
+
+    /* 
+    utility functions 
+    */
+    const getNextSquare = (): Coordinates => {
+        if (coords.row === board.rows - 1 && coords.column === board.columns - 1) {
+            return coords;
+        }
+        if (selection.direction === "across") {
+            return coords.column === board.columns - 1 ? new Coordinates(coords.row + 1, 0) : new Coordinates(coords.row, coords.column + 1);
+        } else {
+            return coords.row === board.rows - 1 ? new Coordinates(0, coords.column + 1) : new Coordinates(coords.row + 1, coords.column);
+        }
+    }
+    const getPrevSquare = (): Coordinates => {
+        if (coords.row === 0 && coords.column === 0) {
+            return coords;
+        }
+        if (selection.direction === "across") {
+            return coords.column === 0 ? new Coordinates(coords.row - 1, board.columns - 1) : new Coordinates(coords.row, coords.column - 1);
+        } else {
+            return coords.row === 0 ? new Coordinates(board.rows - 1, coords.column - 1) : new Coordinates(coords.row - 1, coords.column);
+        }
+    }
+
+    /* 
+    event handlers
+    */
+
+    const char: string = board.getCoord(coords);
+    const disabled = char === Board.BLACKOUT;
     const setChar = (newChar: string) => {
         let newBoard = new Board({rows: board.rows, columns: board.columns, oldBoard: board});
         newBoard.setCoord(coords, newChar);
         setBoard(newBoard);
     };
 
-    const classList = clsx(
-        styles.square,
-        {[styles.highlighted]: highlighted},
-        {[styles.disabled]: disabled},
-        {[styles.selected]: coords.equals(selection.coordinate) && selection.focus},
-        {[styles.disabledSelected]: disabled && coords.equals(selection.coordinate) && selection.focus},
-        {[styles.autofilled]: autofilled}
-    );
-
     const handleKeyPress = (e: KeyboardEvent) => {
+        e.preventDefault(); // prevents the 'Tab' key from jumping to the next input
         /* handle different keypresses */
-        let modifiedSelection = { ...selection};
+        let modifiedSelection = {...selection};
         switch (e.key) {
             case "Backspace":
                 /* delete square value and move one square back */
-                setChar(' ');
-                modifiedSelection.coordinate = getPrevSquare(coords, selection, board.rows, board.columns);
+                setChar(Board.BLANK);
+                modifiedSelection.coordinates = getPrevSquare();
                 break;
 
             case "Enter":
             case "Tab":
-                /* jump to the next word */
-                if (selection.direction === "horizontal") {
-                    if (acrossIndex < acrossList.length - 1) {
-                        modifiedSelection.coordinate = acrossList[acrossIndex + 1];
-                    } else {
-                        modifiedSelection.coordinate = downList[0];
-                        modifiedSelection.direction = "vertical";
-                    }
-                } else {
-                    if (downIndex < downList.length - 1) {
-                        modifiedSelection.coordinate = downList[downIndex + 1];
-                    } else {
-                        modifiedSelection.coordinate = acrossList[0];
-                        modifiedSelection.direction = "horizontal";
-                    } 
+                /* jump to the beginning of the next word */
+                const wordCoords = (selection.direction === "across") ? (acrossWordCoords) : (downWordCoords);
+                const coordsStrArray = (selection.direction === "across") ? (acrossCoordsStrArray) : (downCoordsStrArray);
+                const otherCoordsStrArray = Array.from((selection.direction === "across") ? (downCoordsStrArray) : (acrossCoordsStrArray));
+                if (wordCoords == Coordinates.NONE) {
+                    break;
                 }
+                const index = coordsStrArray.indexOf(wordCoords.toString());
+                // if it's the last word on the board, switch the direction and jump to the beginning of the board
+                let coordsString;
+                if (index === coordsStrArray.length - 1 && otherCoordsStrArray.length !== 0) {
+                    coordsString = otherCoordsStrArray[0];
+                    modifiedSelection.direction = (selection.direction === "across") ? ("down") : ("across"); 
+                } else {
+                    coordsString = coordsStrArray[index + 1];
+                }
+                modifiedSelection.coordinates = Coordinates.fromString(coordsString);
                 break;
+
             case ' ':
-                if (selection.direction === "horizontal") {
-                    if (acrossIndex === -1) {
-                        break;
-                    }
-                    else if (selection.coordinate.column === board.columns - 1 || board.get(selection.coordinate.row, selection.coordinate.column + 1) === '.') {
-                        console.log(acrossIndex);
-                        console.log(acrossList[acrossIndex]);
-                        modifiedSelection.coordinate = acrossList[acrossIndex];
-                    }
-                    else {
-                        modifiedSelection.coordinate = getNextSquare(coords, selection, board.rows, board.columns);
-                    }
-                } else {
-                    if (downIndex === -1) {
-                        break;
-                    }
-                    else if (selection.coordinate.row === board.rows - 1 || board.get(selection.coordinate.row + 1, selection.coordinate.column) === '.') {
-                        modifiedSelection.coordinate = downList[downIndex];
-                    }
-                    else {
-                        modifiedSelection.coordinate = getNextSquare(coords, selection, board.rows, board.columns);
-                    }
+                /* jump to the next letter in the word. if at end of word, jump back to start */
+                if (disabled) {
+                    break;
+                }
+                if (
+                (selection.direction === "across") && 
+                ((selection.coordinates.column === board.columns - 1) || 
+                (board.get(selection.coordinates.row, selection.coordinates.column + 1) === Board.BLACKOUT))
+                ) {
+                    modifiedSelection.coordinates = acrossWordCoords;
+                }
+                else if (
+                (selection.direction === "down") && 
+                ((selection.coordinates.row === board.rows - 1) || 
+                (board.get(selection.coordinates.row + 1, selection.coordinates.column) === Board.BLACKOUT))
+                ) {
+                    modifiedSelection.coordinates = downWordCoords;
+                } 
+                else {
+                    modifiedSelection.coordinates = getNextSquare();
                 }
                 break;
+            
             case '.':
+                /* toggle between disabling or enabling the square */
                 if (disabled) {
-                    setChar(' ');
+                    setChar(Board.BLANK);
                 } else {
-                    setChar('.');
+                    setChar(Board.BLACKOUT);
                 }
                 break;
 
             case "ArrowUp":
                 /* switch direction to up or move up one square */
-                if (modifiedSelection.direction === "horizontal") {
-                    modifiedSelection.direction = "vertical"
+                if (selection.direction === "across") {
+                    modifiedSelection.direction = "down"
                 } 
-                else if (selection.coordinate.row !== 0) {
-                    modifiedSelection.coordinate = new Coordinate(selection.coordinate.row - 1, selection.coordinate.column);
+                else if (selection.coordinates.row !== 0) {
+                    modifiedSelection.coordinates = new Coordinates(selection.coordinates.row - 1, selection.coordinates.column);
                 }
                 break;
 
             case "ArrowDown":
-                if (modifiedSelection.direction === "horizontal") {
-                    modifiedSelection.direction = "vertical"
+                /* switch direction to down or move down one square */
+                if (selection.direction === "across") {
+                    modifiedSelection.direction = "down"
                 } 
-                else if (selection.coordinate.row !== board.rows - 1) {
-                    modifiedSelection.coordinate = new Coordinate(selection.coordinate.row  + 1, selection.coordinate.column);
+                else if (selection.coordinates.row !== board.rows - 1) {
+                    modifiedSelection.coordinates = new Coordinates(selection.coordinates.row  + 1, selection.coordinates.column);
                 }
                 break;
 
             case "ArrowRight":
-                if (modifiedSelection.direction === "vertical") {
-                    modifiedSelection.direction = "horizontal"
+                if (selection.direction === "down") {
+                    modifiedSelection.direction = "across"
                 } 
-                else if (selection.coordinate.column !== board.columns - 1) {
-                    modifiedSelection.coordinate = new Coordinate(selection.coordinate.row, selection.coordinate.column + 1);
+                else if (selection.coordinates.column !== board.columns - 1) {
+                    modifiedSelection.coordinates = new Coordinates(selection.coordinates.row, selection.coordinates.column + 1);
                 }
                 break;
 
             case "ArrowLeft":
-                if (modifiedSelection.direction === "vertical") {
-                    modifiedSelection.direction = "horizontal"
+                if (selection.direction === "down") {
+                    modifiedSelection.direction = "across"
                 } 
-                else if (selection.coordinate.column !== 0) {
-                    modifiedSelection.coordinate = new Coordinate(selection.coordinate.row, selection.coordinate.column - 1);
+                else if (selection.coordinates.column !== 0) {
+                    modifiedSelection.coordinates = new Coordinates(selection.coordinates.row, selection.coordinates.column - 1);
                 }
                 break;
+
             default:
                 /* if the keypress was a letter, assign the square to that letter */
                 if (e.key.length === 1 && e.key.match(/[a-zA-Z]/)) {
                     setChar(e.key.toLowerCase());
-                    modifiedSelection.coordinate = getNextSquare(coords, selection, board.rows, board.columns);
+                    modifiedSelection.coordinates = getNextSquare();
                 }
         }
         setSelection(modifiedSelection);
-    }
+    };
 
     const handleClick = () => {
-        /* focus the square. if the square is already focused, swap the direction */
-        let modifiedSelection = { ...selection };
-        if (coords.equals(selection.coordinate)) {
-            modifiedSelection.direction = (selection.direction === "horizontal" ? "vertical" : "horizontal")
+        /* focus the square. if the square is already focused, toggle the direction */
+        let modifiedSelection = {...selection};
+        if (coords.equals(selection.coordinates)) {
+            modifiedSelection.direction = (selection.direction === "across" ? "down" : "across");
         }
-        modifiedSelection.coordinate = coords;
+        modifiedSelection.coordinates = coords;
         modifiedSelection.focus = true;
         setSelection(modifiedSelection);
-    }
+    };
 
+    /*
+    styling
+    */
+    const classList = clsx(
+        styles.square,
+        {[styles.highlighted]: highlighted},
+        {[styles.disabled]: disabled},
+        {[styles.selected]: coords.equals(selection.coordinates) && selection.focus},
+        {[styles.disabledSelected]: disabled && coords.equals(selection.coordinates) && selection.focus}
+    );
+    
+    const maxBoardSize = board.rows > board.columns ? board.rows : board.columns;
     return (
-    <div style={{ "--board-size": getMaxBoardSize(board) } as React.CSSProperties}>
+    <div style={{ "--board-size": maxBoardSize } as React.CSSProperties}>
         <div className = {styles.cornerValue}>{cornerValue}</div>
         <input
             ref = {inputRef}
             type = "text"
-            value = {char === '.' ? ' ' : char}
+            value = {char === '.' ? ' ' : char} // disabled spaces should be blank
             maxLength = {1}
             className = {classList} 
             onKeyDown = {handleKeyPress}

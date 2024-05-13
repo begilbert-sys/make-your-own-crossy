@@ -8,12 +8,13 @@ import CachedIcon from '@mui/icons-material/Cached';
 import wordBank from "@/data/wordbank.json"
 import styles from '@/styles/Home.module.css';
 
-import { Coordinate } from "@/app/types/coordinate";
+import { Board }from '@/app/types/board';
+import { Coordinates } from "@/app/types/coordinate";
 
 import { SelectionContext, ISelectionContext } from '@/app/contexts/selectioncontext';
 import { BoardContext, IBoardContext } from '@/app/contexts/boardcontext';
 
-import { shuffleArray } from "@/app/lib/shuffle";
+import { shuffleArray } from '@/app/lib/shuffle';
 
 const shuffledWordBank = shuffleArray(wordBank);
 
@@ -39,10 +40,10 @@ export default function WordFinder() {
 
     // update the prompt whenever the selection changes 
     useEffect(() => {
-        if (!selection.coordinate.equals(Coordinate.NONE) && board.getCoord(selection.coordinate) !== '.') {
-            const selectionWord = board.getSelectionWord(selection);
-            if (!selectionWord.equals(Coordinate.NONE)) {
-                const currentPrompt = board.getWord(board.getSelectionWord(selection), selection.direction).replaceAll(' ', '_');
+        if (!selection.coordinates.equals(Coordinates.NONE) && board.getCoord(selection.coordinates) !== Board.BLACKOUT) {
+            const selectionWord = board.getWordStart(selection.coordinates, selection.direction);
+            if (!selectionWord.equals(Coordinates.NONE)) {
+                const currentPrompt = board.mapWordCoords(selection.direction).get(selectionWord.toString())!;
                 if (prompt !== currentPrompt) {
                     setPrompt(currentPrompt);
                 }

@@ -1,5 +1,5 @@
-export class Coordinate {
-    static NONE: Coordinate = new Coordinate(-1, -1);
+export class Coordinates {
+    static NONE: Coordinates = new Coordinates(-1, -1);
     row: number;
     column: number;
     constructor(row: number, column: number) {
@@ -7,7 +7,14 @@ export class Coordinate {
         this.column = column;
         Object.freeze(this); // makes the object immutable
     }
-    equals(other: Coordinate): boolean {
+    equals(other: Coordinates): boolean {
         return this.row === other.row && this.column === other.column;
+    }
+    toString(): string {
+        return `${this.row}, ${this.column}`;
+    }
+    static fromString(coordsStr: string): Coordinates {
+        const [rowStr, colStr] = coordsStr.split(',');
+        return new Coordinates(parseInt(rowStr), parseInt(colStr));
     }
 }

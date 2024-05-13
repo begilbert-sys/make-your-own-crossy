@@ -11,6 +11,9 @@ https://emscripten.org/docs/porting/connecting_cpp_and_javascript/Interacting-wi
 */
 
 export async function generateBoard(board: Board): Promise<Board> {
+    /* 
+    Fill a board with valid letters
+    */ 
     const Module = await BoardGenerator();
     const inputPtr = Module.stringToNewUTF8(board.toString());
     const outputPtr = Module._solve(inputPtr);
