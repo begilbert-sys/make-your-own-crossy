@@ -2,7 +2,7 @@ import { useContext } from 'react';
 
 import Button from '@mui/material/Button';
 
-import { Coordinates } from '@/app/types/coordinate';
+import { Coordinates } from '@/app/types/coordinates';
 import { Board } from '@/app/types/board';
 
 import { ISelectionContext, SelectionContext } from '@/app/contexts/selectioncontext';

@@ -9,7 +9,7 @@ import wordBank from "@/data/wordbank.json"
 import styles from '@/styles/Home.module.css';
 
 import { Board }from '@/app/types/board';
-import { Coordinates } from "@/app/types/coordinate";
+import { Coordinates } from "@/app/types/coordinates";
 
 import { SelectionContext, ISelectionContext } from '@/app/contexts/selectioncontext';
 import { BoardContext, IBoardContext } from '@/app/contexts/boardcontext';
@@ -43,7 +43,8 @@ export default function WordFinder() {
         if (!selection.coordinates.equals(Coordinates.NONE) && board.getCoord(selection.coordinates) !== Board.BLACKOUT) {
             const selectionWord = board.getWordStart(selection.coordinates, selection.direction);
             if (!selectionWord.equals(Coordinates.NONE)) {
-                const currentPrompt = board.mapWordCoords(selection.direction).get(selectionWord.toString())!;
+                console.log(selectionWord, selection.direction);
+                const currentPrompt = board.getWord(selectionWord, selection.direction)!.replaceAll(Board.BLANK, '_');
                 if (prompt !== currentPrompt) {
                     setPrompt(currentPrompt);
                 }

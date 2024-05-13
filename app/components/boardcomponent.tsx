@@ -3,7 +3,7 @@ import RefObject, { useEffect, useRef, useContext } from 'react';
 
 import styles from '@/styles/Home.module.css';
 
-import { Coordinates } from '@/app/types/coordinate';
+import { Coordinates } from '@/app/types/coordinates';
 import { Selection } from '@/app/types/selection';
 
 import { BoardContext, IBoardContext } from '@/app/contexts/boardcontext';
@@ -53,8 +53,20 @@ export default function BoardComponent() {
     const clickWrapperRef = useRef<HTMLDivElement>(null);
     useOutsideClick(clickWrapperRef, setSelection);
 
+    useEffect(() => {
+        /* 
+        sometimes when clicking on a square, the text inside of the square gets highlighted. 
+        this clears the highlight
+        */
+        if (window.getSelection) {
+            window.getSelection()!.removeAllRanges();
+        } else if (document.getSelection()) {
+            document.getSelection()!.empty();
+        }
+    }, [selection])
+
     const boardArray = [];
-    
+
     let selectedWordCoords = null;
     if (!selection.coordinates.equals(Coordinates.NONE)) {
         const wordStart = board.getWordStart(selection.coordinates, selection.direction);
@@ -62,28 +74,20 @@ export default function BoardComponent() {
             selectedWordCoords = wordStart;
         }
     }
-    let cornerValue = 0;
+    const cornerValuesMap = board.getCornerValueMap();
     for (let row = 0; row < board.rows; row++) {
         let rowArray = [];
         for (let col = 0; col < board.columns; col++) {
             const coords = new Coordinates(row, col);
             const shouldHighlight = (selectedWordCoords != null) && (selectedWordCoords.equals(board.getWordStart(coords, selection.direction)));
-            let hasCornerValue = false;
-
-            if (
-            (board.mapWordCoords("across").has(coords.toString())) ||
-            (board.mapWordCoords("down").has(coords.toString()))
-            ) {
-                hasCornerValue = true;
-                cornerValue++;
-            }
+            const cornerValue = cornerValuesMap[row][col];
 
             rowArray.push(
                 <Square 
                     key = {col}
                     coords = {coords}
                     highlighted = {shouldHighlight}
-                    cornerValue = {hasCornerValue ? cornerValue.toString() : ''}
+                    cornerValue = {(cornerValue !== -1) ? (cornerValue.toString()) : ('')}
                 />
             )
         }

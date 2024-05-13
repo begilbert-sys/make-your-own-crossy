@@ -2,7 +2,7 @@
 import { useState, useEffect } from 'react';
 import styles from '@/styles/Home.module.css';
 
-import { Coordinates } from '@/app/types/coordinate';
+import { Coordinates } from '@/app/types/coordinates';
 import { Board } from '@/app/types/board';
 import { Selection } from '@/app/types/selection';
 

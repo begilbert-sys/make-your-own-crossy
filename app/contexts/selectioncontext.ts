@@ -1,6 +1,6 @@
 import { createContext } from 'react';
 import { Selection } from '@/app/types/selection';
-import { Coordinates } from '@/app/types/coordinate';
+import { Coordinates } from '@/app/types/coordinates';
 
 export interface ISelectionContext {
     selection: Selection,

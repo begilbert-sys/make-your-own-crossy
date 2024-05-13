@@ -1,4 +1,4 @@
-import { Coordinates } from '@/app/types/coordinate';
+import { Coordinates } from '@/app/types/coordinates';
 import { Direction } from '@/app/types/board';
 
 export interface Selection {

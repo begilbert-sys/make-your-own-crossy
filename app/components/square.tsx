@@ -4,7 +4,7 @@ import clsx from 'clsx';
 
 import styles from '@/styles/Home.module.css';
 
-import { Coordinates } from '@/app/types/coordinate';
+import { Coordinates } from '@/app/types/coordinates';
 import { Board } from '@/app/types/board';
 
 import { BoardContext, IBoardContext } from '@/app/contexts/boardcontext';
@@ -29,8 +29,8 @@ export default function Square({coords, highlighted, cornerValue} : SquareProps)
     const acrossWordCoords = board.getWordStart(coords, "across");
     const downWordCoords = board.getWordStart(coords, "down");
 
-    const acrossCoordsStrArray = Array.from(board.mapWordCoords("across").keys());
-    const downCoordsStrArray = Array.from(board.mapWordCoords("down").keys());
+    const acrossCoordsList = board.getWordList("across");
+    const downCoordsList = board.getWordList("down");
 
     /* 
     utility functions 
@@ -82,22 +82,21 @@ export default function Square({coords, highlighted, cornerValue} : SquareProps)
             case "Enter":
             case "Tab":
                 /* jump to the beginning of the next word */
-                const wordCoords = (selection.direction === "across") ? (acrossWordCoords) : (downWordCoords);
-                const coordsStrArray = (selection.direction === "across") ? (acrossCoordsStrArray) : (downCoordsStrArray);
-                const otherCoordsStrArray = Array.from((selection.direction === "across") ? (downCoordsStrArray) : (acrossCoordsStrArray));
+                const wordCoords = board.getWordStart(coords, selection.direction);
+                const coordsList = board.getWordList(selection.direction);
+                const otherCoordsList = board.getWordList((selection.direction === "across") ? ("down") : ("across"));
                 if (wordCoords == Coordinates.NONE) {
                     break;
                 }
-                const index = coordsStrArray.indexOf(wordCoords.toString());
+                const index = board.getWordListIndex(coords, selection.direction);
                 // if it's the last word on the board, switch the direction and jump to the beginning of the board
                 let coordsString;
-                if (index === coordsStrArray.length - 1 && otherCoordsStrArray.length !== 0) {
-                    coordsString = otherCoordsStrArray[0];
+                if (index === coordsList.length - 1 && otherCoordsList.length !== 0) {
+                    modifiedSelection.coordinates = otherCoordsList[0];
                     modifiedSelection.direction = (selection.direction === "across") ? ("down") : ("across"); 
                 } else {
-                    coordsString = coordsStrArray[index + 1];
+                    modifiedSelection.coordinates = coordsList[index + 1];
                 }
-                modifiedSelection.coordinates = Coordinates.fromString(coordsString);
                 break;
 
             case ' ':
