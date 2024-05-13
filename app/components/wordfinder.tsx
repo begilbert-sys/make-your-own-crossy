@@ -43,7 +43,6 @@ export default function WordFinder() {
         if (!selection.coordinates.equals(Coordinates.NONE) && board.getCoord(selection.coordinates) !== Board.BLACKOUT) {
             const selectionWord = board.getWordStart(selection.coordinates, selection.direction);
             if (!selectionWord.equals(Coordinates.NONE)) {
-                console.log(selectionWord, selection.direction);
                 const currentPrompt = board.getWord(selectionWord, selection.direction)!.replaceAll(Board.BLANK, '_');
                 if (prompt !== currentPrompt) {
                     setPrompt(currentPrompt);

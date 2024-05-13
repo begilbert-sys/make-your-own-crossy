@@ -5,13 +5,14 @@ import styles from '@/styles/Home.module.css';
 import { Coordinates } from '@/app/types/coordinates';
 import { Board } from '@/app/types/board';
 import { Selection } from '@/app/types/selection';
+import { Clues } from '@/app/types/clues';
 
 import { BoardContext } from '@/app/contexts/boardcontext';
 import { SelectionContext } from '@/app/contexts/selectioncontext';
 
 import BoardComponent from "@/app/components/boardcomponent";
 import DimensionSliders from "@/app/components/dimensionsliders";
-import Clues from "@/app/components/clues";
+import ClueBox from "@/app/components/cluebox";
 import WordFinder from "@/app/components/wordfinder";
 import AutoFill from "@/app/components/autofill";
 import Tools from "@/app/components/tools";
@@ -28,12 +29,16 @@ export default function CrossyBuilder() {
         focus: false
     });
 
+    const [clues, setClues] = useState<Clues>({
+        across: new Array<string>(board.getWordList("across").length).fill(""), 
+        down: new Array<string>(board.getWordList("down").length).fill("")
+    });
+
 
     return (
     <>
         {/* Board + Question Lists */}
         <div className={styles.layout}>
-            {/* Row and Column sliders */}
             <SelectionContext.Provider value = {{selection, setSelection}}>
                 <BoardContext.Provider value = {{board, setBoard}}>
                     <div>
@@ -48,8 +53,20 @@ export default function CrossyBuilder() {
                     <div className={styles.boardCenterWrapper}>
                         <BoardComponent />
                         <ClearBoard />
-                        <Upload/>
+                        <Upload
+                            clues = {clues}
+                        />
                     </div>
+                    <ClueBox 
+                        clues = {clues}
+                        setClues = {setClues}
+                        direction = {"across"}
+                    />
+                    <ClueBox 
+                        clues = {clues}
+                        setClues = {setClues}
+                        direction = {"down"}
+                    />
                 </BoardContext.Provider>
             </SelectionContext.Provider>
         </div>
