@@ -107,6 +107,18 @@ export class Board {
         }
         return result;
     }
+    clear(): void {
+        /*
+        clear the board, except for blacked-out tiles 
+        */
+        for (let row = 0; row < this.rows; row++) {
+            for (let col = 0; col < this.columns; col++) {
+                if (this.get(row, col) !== Board.BLACKOUT) {
+                    this.set(row, col, Board.BLANK);
+                }
+            }
+        }
+    }
 
     getCornerValueMap(): number[][] {
         /* 

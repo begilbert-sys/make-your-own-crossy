@@ -1,6 +1,7 @@
 import { useContext } from 'react';
 
 import Button from '@mui/material/Button';
+import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
 
 import { Coordinates } from '@/app/types/coordinates';
 import { Board } from '@/app/types/board';
@@ -14,7 +15,8 @@ export default function ClearBoard() {
     const {selection, setSelection} = useContext<ISelectionContext>(SelectionContext);
 
     const handleClick = () => {
-        const newBoard = new Board({rows: board.rows, columns: board.columns});
+        board.clear();
+        const newBoard = new Board({rows: board.rows, columns: board.columns, oldBoard: board});
         setBoard(newBoard);
         setSelection({
             coordinates: Coordinates.NONE,
@@ -23,6 +25,9 @@ export default function ClearBoard() {
         });
     }
     return (
-        <Button variant="contained" onClick={handleClick}>Clear Board</Button>
+        <Button variant="contained" onClick={handleClick}>
+            Clear Board
+            <DeleteForeverIcon />
+        </Button>
     )
 }

@@ -179,3 +179,8 @@
 	padding-left: 10px;
 	height: 475px;
 }
+
+.generateBoardButton {
+	display:flex;
+	margin: 0 auto;
+}

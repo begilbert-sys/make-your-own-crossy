@@ -1,22 +1,25 @@
-import type { InferGetServerSidePropsType, GetServerSideProps } from 'next';
-
-import { Board } from '@/app/types/board';
 import { get_mini } from '@/app/api/orm';
 
-interface IPageParams {
-    board: Board,
+import { Board } from '@/app/types/board';
+import { Mini } from '@/app/types/mini';
+
+
+import CrossySolver from "@/app/components/solver/crossysolver";
+interface PageParams {
+    params: { hexID: string}
 }
 
-export const getServerSideProps: GetServerSideProps = async (context) => {
-    const hexID = context.params!.hexID as string;
-    const boardString = await get_mini(hexID);
-    const board = new Board(boardString);
 
-
-};
-
-export default function Page({params}: {params: IPageParams}) {
-
-    const boardString = await downloadBoard(params.hexID);
-    return <p>{boardString}</p>;
+export default async function Page({ params }: PageParams) {
+    const DBRow = await get_mini("46fa4b672");
+    const mini: Mini = {
+        boardString: DBRow.content, 
+        acrossClues: DBRow.across_clues,
+        downClues: DBRow.down_clues
+    }
+    return (
+        <CrossySolver 
+            mini={mini}
+        />
+    );
 }

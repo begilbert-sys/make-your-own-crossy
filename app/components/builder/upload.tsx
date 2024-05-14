@@ -2,8 +2,9 @@ import { useRouter } from 'next/navigation';
 import { useContext } from 'react';
 
 import Button from '@mui/material/Button';
+import UploadIcon from '@mui/icons-material/Upload';
 
-import { Board } from "@/app/types/board";
+
 import { Clues } from "@/app/types/clues";
 import { Mini } from "@/app/types/mini";
 
@@ -31,6 +32,9 @@ export default function Upload({clues}: UploadProps) {
     }
 
     return (
-        <Button variant="contained" onClick={() => uploadBoard()}>UPLOAD BOARD</Button>
+        <Button variant="contained" onClick={() => uploadBoard()}>
+            UPLOAD BOARD
+            <UploadIcon />
+        </Button>
     );
 }

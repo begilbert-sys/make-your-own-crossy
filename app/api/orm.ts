@@ -1,7 +1,9 @@
 
 import sql from "@/app/api/db";
 
+import { Board } from '@/app/types/board';
 import { Mini } from '@/app/types/mini';
+
 
 const path = require('path');
 const querydir = process.cwd() + "/app/api/queries/";
@@ -39,6 +41,8 @@ export async function add_mini(mini: Mini): Promise<string> {
 export async function get_mini(hexID: string): Promise<DBMiniRow> {
     /* get a mini from the DB based on its hex ID */
     const [dbID, dbRand] = getDBIds(hexID);
-    const result = await sql.file(querydir + 'select.sql', [dbID, dbRand]) as DBMiniRow[];
-    return result[0];
+    const result = (await sql.file(querydir + 'select.sql', [dbID, dbRand]) as DBMiniRow[])[0];
+    result.content = result.content.replaceAll('_', Board.BLANK);
+    console.log(result);
+    return result;
 }

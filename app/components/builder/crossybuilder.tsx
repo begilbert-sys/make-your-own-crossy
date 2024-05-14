@@ -1,5 +1,5 @@
 'use client';
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import styles from '@/styles/Home.module.css';
 
 import { Coordinates } from '@/app/types/coordinates';
@@ -11,13 +11,13 @@ import { BoardContext } from '@/app/contexts/boardcontext';
 import { SelectionContext } from '@/app/contexts/selectioncontext';
 
 import BoardComponent from "@/app/components/boardcomponent";
-import DimensionSliders from "@/app/components/dimensionsliders";
-import ClueBox from "@/app/components/cluebox";
-import WordFinder from "@/app/components/wordfinder";
-import AutoFill from "@/app/components/autofill";
+import DimensionSliders from "@/app/components/builder/dimensionsliders";
+import ClueBox from "@/app/components/builder/cluebox";
+import WordFinder from "@/app/components/builder/wordfinder";
+import AutoFill from "@/app/components/builder/autofill";
 import Tools from "@/app/components/tools";
 import ClearBoard from '@/app/components/clearboard';
-import Upload from '@/app/components/upload';
+import Upload from '@/app/components/builder/upload';
 
 
 export default function CrossyBuilder() { 
@@ -40,34 +40,32 @@ export default function CrossyBuilder() {
         {/* Board + Question Lists */}
         <div className={styles.layout}>
             <SelectionContext.Provider value = {{selection, setSelection}}>
-                <BoardContext.Provider value = {{board, setBoard}}>
-                    <div>
-                        <DimensionSliders />
-                        <hr/>
-                        <Tools />
-                        <hr/>
-                        <WordFinder />
-                        <hr/>
-                        <AutoFill />
-                    </div>
-                    <div className={styles.boardCenterWrapper}>
-                        <BoardComponent />
-                        <ClearBoard />
-                        <Upload
-                            clues = {clues}
-                        />
-                    </div>
-                    <ClueBox 
+            <BoardContext.Provider value = {{board, setBoard}}>
+                <div>
+                    <DimensionSliders />
+                    <hr/>
+                    <AutoFill />
+                    <hr/>
+                    <WordFinder />
+                </div>
+                <div className={styles.boardCenterWrapper}>
+                    <BoardComponent />
+                    <ClearBoard />
+                    <Upload
                         clues = {clues}
-                        setClues = {setClues}
-                        direction = {"across"}
                     />
-                    <ClueBox 
-                        clues = {clues}
-                        setClues = {setClues}
-                        direction = {"down"}
-                    />
-                </BoardContext.Provider>
+                </div>
+                <ClueBox 
+                    clues = {clues}
+                    setClues = {setClues}
+                    direction = {"across"}
+                />
+                <ClueBox 
+                    clues = {clues}
+                    setClues = {setClues}
+                    direction = {"down"}
+                />
+            </BoardContext.Provider>
             </SelectionContext.Provider>
         </div>
     </>

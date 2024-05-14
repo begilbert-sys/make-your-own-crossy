@@ -2,6 +2,9 @@ import { useContext, useState } from 'react';
 
 import Button from '@mui/material/Button';
 import CircularProgress from '@mui/material/CircularProgress';
+import AppRegistrationIcon from '@mui/icons-material/AppRegistration';
+
+import styles from '@/styles/Home.module.css';
 
 import { generateBoard } from "@/app/lib/boardgen";
 
@@ -21,18 +24,21 @@ export default function AutoFill() {
     return (
         <div>
             <h3>Feeling Lazy?</h3>
-            <p>The computer can try to generate a board for you!</p>
-            <Button variant="contained" onClick={handleClick}>
+            <p>The autofiller can try to generate a board for you!</p>
+            <Button className={styles.generateBoardButton} variant="contained" onClick={handleClick}>
                 {loading ? (
                     <>
-                    {"Generating"}
+                    {"Generating. . . "}
                     <CircularProgress 
-                        color="inherit"
                         size={20}
+                        sx={{ color: 'black' }}
                     />
-                </>
-                ): ( 
-                    "Generate Board"
+                    </>
+                ): (
+                    <>
+                    {"Generate Board"}
+                    <AppRegistrationIcon />
+                    </>
                 )}
             </Button>
         </div>
