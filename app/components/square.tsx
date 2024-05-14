@@ -13,9 +13,10 @@ import { SelectionContext, ISelectionContext } from '@/app/contexts/selectioncon
 interface SquareProps {
     coords: Coordinates,
     highlighted: boolean,
-    cornerValue: string
+    cornerValue: string,
+    buildMode: boolean
 }
-export default function Square({coords, highlighted, cornerValue} : SquareProps) {
+export default function Square({coords, highlighted, cornerValue, buildMode} : SquareProps) {
     /* 
     variable initialization 
     */
@@ -124,6 +125,9 @@ export default function Square({coords, highlighted, cornerValue} : SquareProps)
                 break;
             
             case '.':
+                if (buildMode) {
+                    break;
+                }
                 /* toggle between disabling or enabling the square */
                 if (disabled) {
                     setChar(Board.BLANK);
@@ -181,6 +185,9 @@ export default function Square({coords, highlighted, cornerValue} : SquareProps)
     };
 
     const handleClick = () => {
+        if (buildMode && disabled) {
+            return;
+        }
         /* focus the square. if the square is already focused, toggle the direction */
         let modifiedSelection = {...selection};
         if (coords.equals(selection.coordinates)) {

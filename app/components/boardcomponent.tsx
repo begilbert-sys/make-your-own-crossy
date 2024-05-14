@@ -46,8 +46,10 @@ function useOutsideClick(ref: RefObject.RefObject<HTMLDivElement>, setSelection:
     }, [ref]);
 
 }
-
-export default function BoardComponent() {
+interface BoardComponentProps {
+    buildMode: boolean
+}
+export default function BoardComponent({buildMode}: BoardComponentProps) {
     const {selection, setSelection} = useContext<ISelectionContext>(SelectionContext);
     const {board, setBoard} = useContext<IBoardContext>(BoardContext);
     const clickWrapperRef = useRef<HTMLDivElement>(null);
@@ -88,6 +90,7 @@ export default function BoardComponent() {
                     coords = {coords}
                     highlighted = {shouldHighlight}
                     cornerValue = {(cornerValue !== -1) ? (cornerValue.toString()) : ('')}
+                    buildMode = {buildMode}
                 />
             )
         }

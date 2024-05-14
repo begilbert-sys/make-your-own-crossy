@@ -25,7 +25,11 @@ export default function ClearBoard() {
         });
     }
     return (
-        <Button variant="contained" onClick={handleClick}>
+        <Button 
+            variant="contained" 
+            onClick={handleClick}
+            sx={{backgroundColor: "red"}}
+        >
             Clear Board
             <DeleteForeverIcon />
         </Button>

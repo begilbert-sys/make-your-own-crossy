@@ -92,11 +92,21 @@
 	letter-spacing: .3rem;
 }
 
+.clueBox {
+	border-width: 3px;
+	border-style: solid;
+	border-radius: 10px;
+	border-color: #888;
+	padding-right: 20px;
+	padding-left: 10px;
+	height: 495px;
+}
+
 .clueHeader {
 	margin-bottom:0px;
 }
 .clueList {
-	height: 405px;
+	height: 425px;
 	overflow-y:auto;
 	border-top: 1px solid #E6E6E6;
 	padding-left: 30px;
@@ -105,7 +115,6 @@
     margin-bottom: 20px;  
 	padding-left: 10px;
 	font-size: 16px;
-	
 }
 .clue::marker {
 	content: counter(list-item); /* Add numbering with a period */
@@ -170,17 +179,31 @@
 	margin-right: 50px;
 }
 
-.clueBox {
-	border-width: 3px;
-	border-style: solid;
-	border-radius: 10px;
-	border-color: #888;
-	padding-right: 20px;
-	padding-left: 10px;
-	height: 475px;
-}
-
 .generateBoardButton {
 	display:flex;
 	margin: 0 auto;
+}
+
+.titlePromptWrapper {
+	display:flex;
+	justify-content: center;
+	align-items: center;
+	width: 100%;
+	margin-left:38px;
+	margin-bottom: 20px
+}
+.titlePrompt {
+	font-size: 18px;
+	font-weight: 600;
+	margin-left: 10px;
+	margin-right: 100px;
+	width: 395px;
+}
+
+.bottomButtons {
+	height: 45px;
+	margin-top: 20px;
+	width:100%;
+	display:flex;
+	justify-content:space-around;
 }

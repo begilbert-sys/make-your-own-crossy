@@ -32,7 +32,11 @@ export default function Upload({clues}: UploadProps) {
     }
 
     return (
-        <Button variant="contained" onClick={() => uploadBoard()}>
+        <Button
+            sx={{backgroundColor: "green"}}
+            variant="contained" 
+            onClick={() => uploadBoard()}
+        >
             UPLOAD BOARD
             <UploadIcon />
         </Button>

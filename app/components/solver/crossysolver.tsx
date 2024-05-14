@@ -32,8 +32,10 @@ export default function CrossySolver({mini}: CrossySolverProps) {
         <div className={styles.layout}>
             <SelectionContext.Provider value = {{selection, setSelection}}>
             <BoardContext.Provider value = {{board, setBoard}}>
-                <BoardComponent />
 
+                <BoardComponent 
+                    buildMode = {false}
+                />
             </BoardContext.Provider>
             </SelectionContext.Provider>
         </div>

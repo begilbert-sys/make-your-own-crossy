@@ -16,6 +16,7 @@ import ClueBox from "@/app/components/builder/cluebox";
 import WordFinder from "@/app/components/builder/wordfinder";
 import AutoFill from "@/app/components/builder/autofill";
 import Tools from "@/app/components/tools";
+import TitlePrompt from "@/app/components/builder/titleprompt";
 import ClearBoard from '@/app/components/clearboard';
 import Upload from '@/app/components/builder/upload';
 
@@ -42,29 +43,40 @@ export default function CrossyBuilder() {
             <SelectionContext.Provider value = {{selection, setSelection}}>
             <BoardContext.Provider value = {{board, setBoard}}>
                 <div>
+                    <Tools />
+                    <hr />
                     <DimensionSliders />
                     <hr/>
                     <AutoFill />
                     <hr/>
                     <WordFinder />
                 </div>
-                <div className={styles.boardCenterWrapper}>
-                    <BoardComponent />
-                    <ClearBoard />
-                    <Upload
-                        clues = {clues}
-                    />
+                <div>
+                    <TitlePrompt />
+                    <div className={styles.layout}>
+                        <div className={styles.boardCenterWrapper}>
+                            <BoardComponent
+                                    buildMode = {true}
+                            />
+                            <div className={styles.bottomButtons}>
+                                    <ClearBoard />
+                                    <Upload
+                                        clues = {clues}
+                                    />
+                            </div>
+                        </div>
+                        <ClueBox 
+                            clues = {clues}
+                            setClues = {setClues}
+                            direction = {"across"}
+                        />
+                        <ClueBox 
+                            clues = {clues}
+                            setClues = {setClues}
+                            direction = {"down"}
+                        />
+                    </div>
                 </div>
-                <ClueBox 
-                    clues = {clues}
-                    setClues = {setClues}
-                    direction = {"across"}
-                />
-                <ClueBox 
-                    clues = {clues}
-                    setClues = {setClues}
-                    direction = {"down"}
-                />
             </BoardContext.Provider>
             </SelectionContext.Provider>
         </div>

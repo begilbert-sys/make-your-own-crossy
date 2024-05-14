@@ -1,4 +1,7 @@
 import { useContext, useRef } from 'react';
+
+import TextField from '@mui/material/TextField';
+
 import styles from '@/styles/Home.module.css';
 
 
@@ -9,7 +12,6 @@ import { Clues } from '@/app/types/clues';
 import { SelectionContext, ISelectionContext } from '@/app/contexts/selectioncontext';
 import { BoardContext, IBoardContext } from '@/app/contexts/boardcontext';
 
-import TextField from '@mui/material/TextField';
 interface ClueBoxProps {
     clues: Clues
     setClues: (c: Clues) => void
