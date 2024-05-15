@@ -1,28 +1,25 @@
 import { get_mini } from '@/app/api/orm';
 
-import { Mini } from '@/app/types/mini';
+import { Crossy, CrossyJSON } from '@/app/types/crossy';
 
+import { notFound } from 'next/navigation'
 
 import CrossySolver from "@/app/components/solver/crossysolver";
+
 interface PageParams {
-    params: { hexID: string}
+    params: { hexID: string }
 }
 
-
 export default async function Page({ params }: PageParams) {
-    const DBRow = await get_mini("46fa4b672");
-    const mini: Mini = {
-        title: DBRow.title,
-        author: DBRow.author,
-        boardString: DBRow.content, 
-        acrossClues: DBRow.across_clues,
-        downClues: DBRow.down_clues
+    const crossyJSON = await get_mini(params.hexID) as CrossyJSON | undefined;
+
+    // 404 if a crossword couldn't be found in the DB
+    if (crossyJSON == undefined) {
+        notFound();
     }
+
+
     return (
-        <>
-        <CrossySolver 
-            mini={mini}
-        />
-        </>
+        <p>{JSON.stringify(crossyJSON)}</p>
     );
 }

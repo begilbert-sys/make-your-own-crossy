@@ -36,7 +36,7 @@ export default function CrossyBuilder() {
         <div className={styles.layout}>
             <SelectionContext.Provider value = {{selection, setSelection}}>
             <CrossyJSONContext.Provider value = {{crossyJSON, setCrossyJSON}}>
-                <div>
+                <div className={styles.sidebarWrapper}>
                     <Tools />
                     <hr />
                     <DimensionSliders />

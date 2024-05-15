@@ -10,7 +10,7 @@
 #include "matrix.h"
 #include "utils/strutil.h"
 
-#define BLANK '_'
+#define BLANK ' '
 #define BLACKOUT '.'
 
 class Board {

@@ -1,7 +1,7 @@
 import { useContext } from 'react';
 import Slider from '@mui/material/Slider';
 
-import styles from '@/styles/Home.module.css';
+import styles from '@/styles/Builder.module.css';
 
 import { Crossy } from '@/app/types/crossy';
 

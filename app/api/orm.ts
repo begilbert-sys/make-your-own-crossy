@@ -1,8 +1,7 @@
 
 import sql from "@/app/api/db";
 
-import { Board } from '@/app/types/crossy';
-import { Mini } from '@/app/types/mini';
+import { CrossyJSON } from '@/app/types/crossy';
 
 
 const path = require('path');
@@ -34,16 +33,29 @@ function getHexID(dbID: number, dbRand: number): string {
     return bigIntID.toString(16);
 }
 
-export async function add_mini(mini: Mini): Promise<string> {
+export async function add_mini(crossyJSON: CrossyJSON): Promise<string> {
     /* add a mini to the DB and return iuts generated hex ID */
-    const result = (await sql.file(querydir + 'insert.sql', [mini.boardString, mini.acrossClues, mini.downClues]) as DBMiniRow[])[0];
+    const result = (await sql.file(
+        querydir + 'insert.sql', 
+        [crossyJSON.title, crossyJSON.author, crossyJSON.boardString, crossyJSON.acrossClues, crossyJSON.downClues]
+    ) as DBMiniRow[])[0];
+
     return getHexID(result.id, result.rand);
 }
 
-export async function get_mini(hexID: string): Promise<DBMiniRow> {
+export async function get_mini(hexID: string): Promise<CrossyJSON | undefined> {
     /* get a mini from the DB based on its hex ID */
     const [dbID, dbRand] = getDBIds(hexID);
-    const result = (await sql.file(querydir + 'select.sql', [dbID, dbRand]) as DBMiniRow[])[0];
-    result.content = result.content.replaceAll('_', Board.BLANK);
-    return result;
+    const row = (await sql.file(querydir + 'select.sql', [dbID, dbRand]) as DBMiniRow[])[0];
+    if (row == undefined) {
+        return undefined;
+    }
+    const crossyJSON = {
+        title: row.title,
+        author: row.author,
+        boardString: row.content,
+        acrossClues: row.across_clues,
+        downClues: row.down_clues
+    }
+    return crossyJSON;
 }

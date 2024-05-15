@@ -1,7 +1,5 @@
 import { useContext, useRef } from 'react';
 
-import TextField from '@mui/material/TextField';
-
 import styles from '@/styles/Home.module.css';
 
 
@@ -40,6 +38,16 @@ export default function ClueBox({direction}: ClueBoxProps) {
         setCrossyJSON({...crossyJSON});
     }
 
+    const handleResize = (e:any) => {
+        /* 
+        this handler (pulled from stackoverflow) resizes the textbox on every input
+        to adjust the line length
+        */
+        e.target.style.height = "0px";
+        const scrollHeight = e.target.scrollHeight;
+        e.target.style.height = scrollHeight + "px";
+    }
+
 
     let clueList = [];
     
@@ -49,14 +57,13 @@ export default function ClueBox({direction}: ClueBoxProps) {
         const value = (direction === "across") ? (crossyJSON.acrossClues[i]) : (crossyJSON.downClues[i]);
         clueList.push(
             <li value = {cornerValue} key={cornerValue} className={styles.clue}>
-                <TextField 
-                    multiline 
-                    hiddenLabel
-                    size = "small" 
-                    variant = "outlined"
+                <textarea
+                    className={styles.clueTextbox}
                     value={value}
+                    maxLength={140}
                     onFocus = {(e) => handleFocus(e, coords)}
                     onChange = {(e) => handleChange(i, e.target.value)}
+                    onInput = {(e) => handleResize(e)}
                 />
             </li>
         )

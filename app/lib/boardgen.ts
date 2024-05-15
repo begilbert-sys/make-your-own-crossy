@@ -15,11 +15,12 @@ export async function generateBoard(crossyJSON: CrossyJSON): Promise<CrossyJSON>
     Fill a board with valid letters
     */ 
     const Module = await BoardGenerator();
-    const inputPtr = Module.stringToNewUTF8(crossyJSON);
+    const inputPtr = Module.stringToNewUTF8(crossyJSON.boardString);
     const outputPtr = Module._solve(inputPtr);
     const outputString = Module.UTF8ToString(outputPtr);
     Module._free(outputPtr);
     crossyJSON.boardString = outputString;
+    console.log(outputString);
     return {...crossyJSON};
 
 }

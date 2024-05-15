@@ -1,0 +1,66 @@
+
+.sliderRow {
+	display:flex;
+	justify-content:flex-start;
+	align-items:center;
+}
+.wordFinderWrapper {
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	align-items:center;
+}
+.wordFinderInput {
+	text-align:center;
+	font-size: 1.275rem;
+	text-transform: uppercase;
+	letter-spacing: .3rem;
+}
+
+
+.generateBoardButton {
+	display:flex;
+	margin: 0 auto;
+}
+.generatorTooltip {
+	position: absolute;
+	left: 380px;
+}
+
+
+.titlePromptWrapper {
+	display:flex;
+	justify-content: center;
+	align-items: center;
+	width: 100%;
+	margin-left:38px;
+	margin-bottom: 20px
+}
+.titlePrompt {
+	font-size: 18px;
+	font-weight: 600;
+	margin-left: 10px;
+	margin-right: 100px;
+	width: 395px;
+}
+
+.bottomButtons {
+	height: 45px;
+	margin-top: 20px;
+	width:100%;
+	display:flex;
+	justify-content:space-around;
+}
+
+.modalError {
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+	width: 400px;
+	padding:10px 20px;
+	background-color: white;
+	border: 2px solid #000;
+	border-radius: 10px;
+	box-shadow: 24px;
+}

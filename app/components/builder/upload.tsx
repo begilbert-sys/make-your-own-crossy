@@ -5,7 +5,7 @@ import Button from '@mui/material/Button';
 import Modal from '@mui/material/Modal';
 import UploadIcon from '@mui/icons-material/Upload';
 
-import styles from '@/styles/Home.module.css';
+import styles from '@/styles/Builder.module.css';
 
 import { Crossy, CrossyJSON } from "@/app/types/crossy";
 

@@ -1,7 +1,7 @@
 import { useContext } from 'react';
 import TextField from '@mui/material/TextField';
 
-import styles from '@/styles/Home.module.css';
+import styles from '@/styles/Builder.module.css';
 
 import { CrossyJSONContext, ICrossyJSONContext } from '@/app/contexts/crossyjsoncontext';
 

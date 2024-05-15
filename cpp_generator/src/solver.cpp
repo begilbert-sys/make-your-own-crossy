@@ -209,9 +209,5 @@ bool Solver::solve(Board& board) {
     }
     
     bool result = recur({0, 0}, board, DP);
-    for (const std::string& word : added_words) {
-        int length = (int)word.length();
-        fixedtrie_array[length - WORD_MIN]->remove(word);
-    }
     return result;
 }

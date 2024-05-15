@@ -47,9 +47,6 @@ Board::Board(std::string board_string) {
     std::string rowstr = "";
     for (const char& c : board_string) {
         switch (c) {
-            case ' ':
-                break;
-
             case BLANK:
             case BLACKOUT:
                 rowstr += c;
