@@ -8,11 +8,11 @@ import CachedIcon from '@mui/icons-material/Cached';
 import wordBank from "@/data/wordbank.json"
 import styles from '@/styles/Home.module.css';
 
-import { Board }from '@/app/types/board';
+import { Crossy }from '@/app/types/crossy';
 import { Coordinates } from "@/app/types/coordinates";
 
 import { SelectionContext, ISelectionContext } from '@/app/contexts/selectioncontext';
-import { BoardContext, IBoardContext } from '@/app/contexts/boardcontext';
+import { CrossyJSONContext, ICrossyJSONContext } from '@/app/contexts/crossyjsoncontext';
 
 import { shuffleArray } from '@/app/lib/shuffle';
 
@@ -31,19 +31,21 @@ function wordMatch(prompt: string, word: string): boolean {
 }
 
 export default function WordFinder() {
-    const {board, setBoard} = useContext<IBoardContext>(BoardContext);
+    const {crossyJSON, setCrossyJSON} = useContext<ICrossyJSONContext>(CrossyJSONContext);
     const {selection, setSelection} = useContext<ISelectionContext>(SelectionContext);
 
-    const defaultPrompt = '_'.repeat(board.columns);
+    const crossy = new Crossy(crossyJSON);
+
+    const defaultPrompt = '_'.repeat(crossy.columns);
     const [prompt, setPrompt] = useState<string>(defaultPrompt);
     const [clickCount, setClickCount] = useState<number>(0);
 
     // update the prompt whenever the selection changes 
     useEffect(() => {
-        if (!selection.coordinates.equals(Coordinates.NONE) && board.getCoord(selection.coordinates) !== Board.BLACKOUT) {
-            const selectionWord = board.getWordStart(selection.coordinates, selection.direction);
+        if (!selection.coordinates.equals(Coordinates.NONE) && crossy.getCoord(selection.coordinates) !== Crossy.BLACKOUT) {
+            const selectionWord = crossy.getWordStart(selection.coordinates, selection.direction);
             if (!selectionWord.equals(Coordinates.NONE)) {
-                const currentPrompt = board.getWord(selectionWord, selection.direction)!.replaceAll(Board.BLANK, '_');
+                const currentPrompt = crossy.getWord(selectionWord, selection.direction)!.replaceAll(Crossy.BLANK, '_');
                 if (prompt !== currentPrompt) {
                     setPrompt(currentPrompt);
                 }
@@ -71,8 +73,8 @@ export default function WordFinder() {
                     suppressHydrationWarning
                 />
                 <br/>
+                <h2 style={{margin: 0}} suppressHydrationWarning>{word}</h2>
                 <Button variant="contained" onClick={() => setClickCount(clickCount + 1)}>REGENERATE <CachedIcon /></Button>
-                <h2 suppressHydrationWarning>{word}</h2>
             </div>
         </div>
     )

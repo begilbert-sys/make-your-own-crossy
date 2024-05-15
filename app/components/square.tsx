@@ -5,9 +5,9 @@ import clsx from 'clsx';
 import styles from '@/styles/Home.module.css';
 
 import { Coordinates } from '@/app/types/coordinates';
-import { Board } from '@/app/types/board';
+import { Crossy, CrossyJSON } from '@/app/types/crossy';
 
-import { BoardContext, IBoardContext } from '@/app/contexts/boardcontext';
+import { CrossyJSONContext, ICrossyJSONContext } from '@/app/contexts/crossyjsoncontext';
 import { SelectionContext, ISelectionContext } from '@/app/contexts/selectioncontext';
 
 interface SquareProps {
@@ -21,29 +21,31 @@ export default function Square({coords, highlighted, cornerValue, buildMode} : S
     variable initialization 
     */
     const {selection, setSelection} = useContext<ISelectionContext>(SelectionContext);
-    const {board, setBoard} = useContext<IBoardContext>(BoardContext);
+    const {crossyJSON, setCrossyJSON} = useContext<ICrossyJSONContext>(CrossyJSONContext);
     const inputRef = useRef<HTMLInputElement>(null);
     if (inputRef.current != null && selection.focus && coords.equals(selection.coordinates)) {
         inputRef.current.focus();
     }
 
-    const acrossWordCoords = board.getWordStart(coords, "across");
-    const downWordCoords = board.getWordStart(coords, "down");
+    const crossy = new Crossy(crossyJSON);
 
-    const acrossCoordsList = board.getWordList("across");
-    const downCoordsList = board.getWordList("down");
+    const acrossWordCoords = crossy.getWordStart(coords, "across");
+    const downWordCoords = crossy.getWordStart(coords, "down");
+
+    const acrossCoordsList = crossy.getWordList("across");
+    const downCoordsList = crossy.getWordList("down");
 
     /* 
     utility functions 
     */
     const getNextSquare = (): Coordinates => {
-        if (coords.row === board.rows - 1 && coords.column === board.columns - 1) {
+        if (coords.row === crossy.rows - 1 && coords.column === crossy.columns - 1) {
             return coords;
         }
         if (selection.direction === "across") {
-            return coords.column === board.columns - 1 ? new Coordinates(coords.row + 1, 0) : new Coordinates(coords.row, coords.column + 1);
+            return coords.column === crossy.columns - 1 ? new Coordinates(coords.row + 1, 0) : new Coordinates(coords.row, coords.column + 1);
         } else {
-            return coords.row === board.rows - 1 ? new Coordinates(0, coords.column + 1) : new Coordinates(coords.row + 1, coords.column);
+            return coords.row === crossy.rows - 1 ? new Coordinates(0, coords.column + 1) : new Coordinates(coords.row + 1, coords.column);
         }
     }
     const getPrevSquare = (): Coordinates => {
@@ -51,9 +53,9 @@ export default function Square({coords, highlighted, cornerValue, buildMode} : S
             return coords;
         }
         if (selection.direction === "across") {
-            return coords.column === 0 ? new Coordinates(coords.row - 1, board.columns - 1) : new Coordinates(coords.row, coords.column - 1);
+            return coords.column === 0 ? new Coordinates(coords.row - 1, crossy.columns - 1) : new Coordinates(coords.row, coords.column - 1);
         } else {
-            return coords.row === 0 ? new Coordinates(board.rows - 1, coords.column - 1) : new Coordinates(coords.row - 1, coords.column);
+            return coords.row === 0 ? new Coordinates(crossy.rows - 1, coords.column - 1) : new Coordinates(coords.row - 1, coords.column);
         }
     }
 
@@ -61,12 +63,11 @@ export default function Square({coords, highlighted, cornerValue, buildMode} : S
     event handlers
     */
 
-    const char: string = board.getCoord(coords);
-    const disabled = char === Board.BLACKOUT;
+    const char: string = crossy.getCoord(coords);
+    const disabled = char === Crossy.BLACKOUT;
     const setChar = (newChar: string) => {
-        let newBoard = new Board({rows: board.rows, columns: board.columns, oldBoard: board});
-        newBoard.setCoord(coords, newChar);
-        setBoard(newBoard);
+        crossy.setCoord(coords, newChar);
+        setCrossyJSON(crossy.toJSON());
     };
 
     const handleKeyPress = (e: KeyboardEvent) => {
@@ -76,20 +77,20 @@ export default function Square({coords, highlighted, cornerValue, buildMode} : S
         switch (e.key) {
             case "Backspace":
                 /* delete square value and move one square back */
-                setChar(Board.BLANK);
+                setChar(Crossy.BLANK);
                 modifiedSelection.coordinates = getPrevSquare();
                 break;
 
             case "Enter":
             case "Tab":
                 /* jump to the beginning of the next word */
-                const wordCoords = board.getWordStart(coords, selection.direction);
-                const coordsList = board.getWordList(selection.direction);
-                const otherCoordsList = board.getWordList((selection.direction === "across") ? ("down") : ("across"));
+                const wordCoords = crossy.getWordStart(coords, selection.direction);
+                const coordsList = crossy.getWordList(selection.direction);
+                const otherCoordsList = crossy.getWordList((selection.direction === "across") ? ("down") : ("across"));
                 if (wordCoords == Coordinates.NONE) {
                     break;
                 }
-                const index = board.getWordListIndex(coords, selection.direction);
+                const index = crossy.getWordListIndex(coords, selection.direction);
                 // if it's the last word on the board, switch the direction and jump to the beginning of the board
                 let coordsString;
                 if (index === coordsList.length - 1 && otherCoordsList.length !== 0) {
@@ -107,15 +108,15 @@ export default function Square({coords, highlighted, cornerValue, buildMode} : S
                 }
                 if (
                 (selection.direction === "across") && 
-                ((selection.coordinates.column === board.columns - 1) || 
-                (board.get(selection.coordinates.row, selection.coordinates.column + 1) === Board.BLACKOUT))
+                ((selection.coordinates.column === crossy.columns - 1) || 
+                (crossy.get(selection.coordinates.row, selection.coordinates.column + 1) === Crossy.BLACKOUT))
                 ) {
                     modifiedSelection.coordinates = acrossWordCoords;
                 }
                 else if (
                 (selection.direction === "down") && 
-                ((selection.coordinates.row === board.rows - 1) || 
-                (board.get(selection.coordinates.row + 1, selection.coordinates.column) === Board.BLACKOUT))
+                ((selection.coordinates.row === crossy.rows - 1) || 
+                (crossy.get(selection.coordinates.row + 1, selection.coordinates.column) === Crossy.BLACKOUT))
                 ) {
                     modifiedSelection.coordinates = downWordCoords;
                 } 
@@ -125,14 +126,14 @@ export default function Square({coords, highlighted, cornerValue, buildMode} : S
                 break;
             
             case '.':
-                if (buildMode) {
+                if (!buildMode) {
                     break;
                 }
                 /* toggle between disabling or enabling the square */
                 if (disabled) {
-                    setChar(Board.BLANK);
+                    setChar(Crossy.BLANK);
                 } else {
-                    setChar(Board.BLACKOUT);
+                    setChar(Crossy.BLACKOUT);
                 }
                 break;
 
@@ -151,7 +152,7 @@ export default function Square({coords, highlighted, cornerValue, buildMode} : S
                 if (selection.direction === "across") {
                     modifiedSelection.direction = "down"
                 } 
-                else if (selection.coordinates.row !== board.rows - 1) {
+                else if (selection.coordinates.row !== crossy.rows - 1) {
                     modifiedSelection.coordinates = new Coordinates(selection.coordinates.row  + 1, selection.coordinates.column);
                 }
                 break;
@@ -160,7 +161,7 @@ export default function Square({coords, highlighted, cornerValue, buildMode} : S
                 if (selection.direction === "down") {
                     modifiedSelection.direction = "across"
                 } 
-                else if (selection.coordinates.column !== board.columns - 1) {
+                else if (selection.coordinates.column !== crossy.columns - 1) {
                     modifiedSelection.coordinates = new Coordinates(selection.coordinates.row, selection.coordinates.column + 1);
                 }
                 break;
@@ -185,7 +186,7 @@ export default function Square({coords, highlighted, cornerValue, buildMode} : S
     };
 
     const handleClick = () => {
-        if (buildMode && disabled) {
+        if (!buildMode && disabled) {
             return;
         }
         /* focus the square. if the square is already focused, toggle the direction */
@@ -209,7 +210,7 @@ export default function Square({coords, highlighted, cornerValue, buildMode} : S
         {[styles.disabledSelected]: disabled && coords.equals(selection.coordinates) && selection.focus}
     );
     
-    const maxBoardSize = board.rows > board.columns ? board.rows : board.columns;
+    const maxBoardSize = crossy.rows > crossy.columns ? crossy.rows : crossy.columns;
     return (
     <div style={{ "--board-size": maxBoardSize } as React.CSSProperties}>
         <div className = {styles.cornerValue}>{cornerValue}</div>

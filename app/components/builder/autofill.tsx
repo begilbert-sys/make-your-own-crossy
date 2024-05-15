@@ -8,16 +8,16 @@ import styles from '@/styles/Home.module.css';
 
 import { generateBoard } from "@/app/lib/boardgen";
 
-import { BoardContext, IBoardContext } from "@/app/contexts/boardcontext";
+import { CrossyJSONContext, ICrossyJSONContext } from "@/app/contexts/crossyjsoncontext";
 
 
 export default function AutoFill() {
-    const {board, setBoard} = useContext<IBoardContext>(BoardContext);
+    const {crossyJSON, setCrossyJSON} = useContext<ICrossyJSONContext>(CrossyJSONContext);
     const [loading, setLoading] = useState<boolean> (false);
     const handleClick = async () => {
         setLoading(true);
-        const newBoard = await generateBoard(board);
-        setBoard(newBoard);
+        const newCrossyJSON = await generateBoard(crossyJSON);
+        setCrossyJSON(newCrossyJSON);
         setLoading(false);
     };
     

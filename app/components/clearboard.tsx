@@ -4,20 +4,21 @@ import Button from '@mui/material/Button';
 import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
 
 import { Coordinates } from '@/app/types/coordinates';
-import { Board } from '@/app/types/board';
+import { Crossy } from '@/app/types/crossy';
 
 import { ISelectionContext, SelectionContext } from '@/app/contexts/selectioncontext';
-import { IBoardContext, BoardContext } from '@/app/contexts/boardcontext';
+import { ICrossyJSONContext, CrossyJSONContext } from '@/app/contexts/crossyjsoncontext';
 
 export default function ClearBoard() {
-    const {board, setBoard} = useContext<IBoardContext>(BoardContext);
+    const {crossyJSON, setCrossyJSON} = useContext<ICrossyJSONContext>(CrossyJSONContext);
 
     const {selection, setSelection} = useContext<ISelectionContext>(SelectionContext);
 
+    const crossy = new Crossy(crossyJSON);
+
     const handleClick = () => {
-        board.clear();
-        const newBoard = new Board({rows: board.rows, columns: board.columns, oldBoard: board});
-        setBoard(newBoard);
+        crossy.clear();
+        setCrossyJSON(crossy.toJSON());
         setSelection({
             coordinates: Coordinates.NONE,
             direction: "across",

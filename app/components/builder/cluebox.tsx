@@ -6,23 +6,21 @@ import styles from '@/styles/Home.module.css';
 
 
 import { Coordinates } from '@/app/types/coordinates';
-import { Direction } from '@/app/types/board';
-import { Clues } from '@/app/types/clues';
+import { Crossy, Direction } from '@/app/types/crossy';
 
 import { SelectionContext, ISelectionContext } from '@/app/contexts/selectioncontext';
-import { BoardContext, IBoardContext } from '@/app/contexts/boardcontext';
+import { CrossyJSONContext, ICrossyJSONContext } from '@/app/contexts/crossyjsoncontext';
 
 interface ClueBoxProps {
-    clues: Clues
-    setClues: (c: Clues) => void
     direction: Direction
 }
-export default function ClueBox({clues, setClues, direction}: ClueBoxProps) {
-    const {board, setBoard} = useContext<IBoardContext>(BoardContext);
+export default function ClueBox({direction}: ClueBoxProps) {
+    const {crossyJSON, setCrossyJSON} = useContext<ICrossyJSONContext>(CrossyJSONContext);
     const {selection, setSelection} = useContext<ISelectionContext>(SelectionContext);
 
-    const wordList = board.getWordList(direction);
-    const cornerValueMap = board.getCornerValueMap();
+    const crossy = new Crossy(crossyJSON);
+    const wordList = crossy.getWordList(direction);
+    const cornerValueMap = crossy.getCornerValueMap();
 
 
     const handleFocus = (event: any, coords: Coordinates) => {
@@ -35,11 +33,11 @@ export default function ClueBox({clues, setClues, direction}: ClueBoxProps) {
 
     const handleChange = (wordIndex: number, input: string) => {
         if (direction === "across") {
-            clues.across[wordIndex] = input;
+            crossyJSON.acrossClues[wordIndex] = input;
         } else {
-            clues.down[wordIndex] = input;
+            crossyJSON.downClues[wordIndex] = input;
         }
-        setClues({...clues});
+        setCrossyJSON({...crossyJSON});
     }
 
 
@@ -48,7 +46,7 @@ export default function ClueBox({clues, setClues, direction}: ClueBoxProps) {
     for (let i = 0; i < wordList.length; i++) {
         const coords = wordList[i];
         const cornerValue = cornerValueMap[coords.row][coords.column];
-        const value = (direction === "across") ? (clues.across[i]) : (clues.down[i]);
+        const value = (direction === "across") ? (crossyJSON.acrossClues[i]) : (crossyJSON.downClues[i]);
         clueList.push(
             <li value = {cornerValue} key={cornerValue} className={styles.clue}>
                 <TextField 

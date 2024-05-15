@@ -1,5 +1,5 @@
 import { Coordinates } from '@/app/types/coordinates';
-import { Direction } from '@/app/types/board';
+import { Direction } from '@/app/types/crossy';
 
 export interface Selection {
     coordinates: Coordinates,

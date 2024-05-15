@@ -3,45 +3,39 @@ import { useState } from 'react';
 import styles from '@/styles/Home.module.css';
 
 import { Coordinates } from '@/app/types/coordinates';
-import { Board } from '@/app/types/board';
+import { Crossy, CrossyJSON, defaultCrossyJSON } from '@/app/types/crossy';
 import { Selection } from '@/app/types/selection';
-import { Clues } from '@/app/types/clues';
 
-import { BoardContext } from '@/app/contexts/boardcontext';
+import { CrossyJSONContext } from '@/app/contexts/crossyjsoncontext';
 import { SelectionContext } from '@/app/contexts/selectioncontext';
 
-import BoardComponent from "@/app/components/boardcomponent";
+import Board from "@/app/components/board";
 import DimensionSliders from "@/app/components/builder/dimensionsliders";
 import ClueBox from "@/app/components/builder/cluebox";
 import WordFinder from "@/app/components/builder/wordfinder";
 import AutoFill from "@/app/components/builder/autofill";
-import Tools from "@/app/components/tools";
+import Tools from "@/app/components/builder/tools";
 import TitlePrompt from "@/app/components/builder/titleprompt";
 import ClearBoard from '@/app/components/clearboard';
 import Upload from '@/app/components/builder/upload';
 
 
 export default function CrossyBuilder() { 
-    const [board, setBoard] = useState<Board>(new Board({rows: 5, columns: 5})); // board starts as 5x5 by default  
+    const [crossyJSON, setCrossyJSON] = useState<CrossyJSON>(defaultCrossyJSON); // board starts as 5x5 by default  
 
     const [selection, setSelection] = useState<Selection>({
         coordinates: Coordinates.NONE,
         direction: "across",
         focus: false
     });
-
-    const [clues, setClues] = useState<Clues>({
-        across: new Array<string>(board.getWordList("across").length).fill(""), 
-        down: new Array<string>(board.getWordList("down").length).fill("")
-    });
-
+    console.log(crossyJSON);
 
     return (
     <>
         {/* Board + Question Lists */}
         <div className={styles.layout}>
             <SelectionContext.Provider value = {{selection, setSelection}}>
-            <BoardContext.Provider value = {{board, setBoard}}>
+            <CrossyJSONContext.Provider value = {{crossyJSON, setCrossyJSON}}>
                 <div>
                     <Tools />
                     <hr />
@@ -55,29 +49,23 @@ export default function CrossyBuilder() {
                     <TitlePrompt />
                     <div className={styles.layout}>
                         <div className={styles.boardCenterWrapper}>
-                            <BoardComponent
-                                    buildMode = {true}
+                            <Board
+                                buildMode = {true}
                             />
                             <div className={styles.bottomButtons}>
                                     <ClearBoard />
-                                    <Upload
-                                        clues = {clues}
-                                    />
+                                    <Upload/>
                             </div>
                         </div>
                         <ClueBox 
-                            clues = {clues}
-                            setClues = {setClues}
                             direction = {"across"}
                         />
                         <ClueBox 
-                            clues = {clues}
-                            setClues = {setClues}
                             direction = {"down"}
                         />
                     </div>
                 </div>
-            </BoardContext.Provider>
+            </CrossyJSONContext.Provider>
             </SelectionContext.Provider>
         </div>
     </>

@@ -1,6 +1,6 @@
 import BoardGenerator from '@/cpp_generator/generator';
 
-import { Board } from '@/app/types/board';
+import { CrossyJSON } from '@/app/types/crossy';
 
 /* 
 This is a wrapper function for the emscripten-generated C++ code 
@@ -10,17 +10,16 @@ More info here:
 https://emscripten.org/docs/porting/connecting_cpp_and_javascript/Interacting-with-code.html
 */
 
-export async function generateBoard(board: Board): Promise<Board> {
+export async function generateBoard(crossyJSON: CrossyJSON): Promise<CrossyJSON> {
     /* 
     Fill a board with valid letters
     */ 
     const Module = await BoardGenerator();
-    const inputPtr = Module.stringToNewUTF8(board.toString());
+    const inputPtr = Module.stringToNewUTF8(crossyJSON);
     const outputPtr = Module._solve(inputPtr);
-    const result = Module.UTF8ToString(outputPtr);
+    const outputString = Module.UTF8ToString(outputPtr);
     Module._free(outputPtr);
-
-    const newBoard = new Board(result);
-    return newBoard;
+    crossyJSON.boardString = outputString;
+    return {...crossyJSON};
 
 }

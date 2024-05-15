@@ -1,27 +1,59 @@
 import { useRouter } from 'next/navigation';
-import { useContext } from 'react';
+import { useState, useContext } from 'react';
 
 import Button from '@mui/material/Button';
+import Modal from '@mui/material/Modal';
 import UploadIcon from '@mui/icons-material/Upload';
 
+import styles from '@/styles/Home.module.css';
 
-import { Clues } from "@/app/types/clues";
-import { Mini } from "@/app/types/mini";
+import { Crossy, CrossyJSON } from "@/app/types/crossy";
 
-import { BoardContext, IBoardContext } from '@/app/contexts/boardcontext';
+import { CrossyJSONContext, ICrossyJSONContext } from '@/app/contexts/crossyjsoncontext';
 
-interface UploadProps {
-    clues: Clues
+import { styled } from '@mui/material';
+
+enum UploadError  {
+    NONE   = "",
+    TITLE  = "Your board is missing a title!",
+    AUTHOR = "Your board is missing an author!",
+    BOARD  = "Your board is not entirely filled in!",
+    CLUES  = "Your board is missing one of its clues!"
 }
-export default function Upload({clues}: UploadProps) {
-    const {board, setBoard} = useContext<IBoardContext>(BoardContext);
+
+function verifyCrossword(crossyJSON: CrossyJSON): UploadError {
+    if (crossyJSON.title === "") {
+        return UploadError.TITLE;
+    }
+    else if (crossyJSON.author === "") {
+        return UploadError.AUTHOR;
+    }
+    else if (crossyJSON.boardString.includes(Crossy.BLANK)) {
+        return UploadError.BOARD;
+    }
+    else if (crossyJSON.acrossClues.includes("") || crossyJSON.acrossClues.includes("")) {
+        return UploadError.CLUES;
+    } 
+    else {
+        return UploadError.NONE;
+    }
+}
+
+export default function Upload() {
+    const {crossyJSON, setCrossyJSON} = useContext<ICrossyJSONContext>(CrossyJSONContext);
+    const [modalError, setModalError] = useState<UploadError>(UploadError.NONE);
     const router = useRouter();
-    const uploadBoard = async () => {
-        const mini: Mini = {boardString: board.toString(), acrossClues: clues.across, downClues: clues.down};
+    const handleBoardUpload = async () => {
+        const crossyError = verifyCrossword(crossyJSON);
+        if (crossyError != UploadError.NONE) {
+            setModalError(crossyError);
+            console.log(crossyJSON);
+            return;
+        }
         const res = await fetch("/api/", {
             method: "POST",
             headers: { "Content-Type" : "application/json" },
-            body: JSON.stringify(mini)
+            body: JSON.stringify(crossyJSON)
         });
         if (!res.ok) {
             console.error(res);
@@ -32,13 +64,27 @@ export default function Upload({clues}: UploadProps) {
     }
 
     return (
+        <>
         <Button
             sx={{backgroundColor: "green"}}
             variant="contained" 
-            onClick={() => uploadBoard()}
+            onClick={() => handleBoardUpload()}
         >
             UPLOAD BOARD
             <UploadIcon />
         </Button>
+
+        <Modal
+            open={(modalError != UploadError.NONE)}
+            onClose={() => setModalError(UploadError.NONE)}
+            aria-labelledby="modal-modal-title"
+            aria-describedby="modal-modal-description"
+        >
+            <div className={styles.modalError}>
+                <h2 id="modal-modal-title">Upload Error</h2>
+                <p id="modal-modal-description">{modalError}</p>
+            </div>
+        </Modal>
+        </>
     );
 }

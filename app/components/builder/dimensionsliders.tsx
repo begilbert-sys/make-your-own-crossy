@@ -3,14 +3,16 @@ import Slider from '@mui/material/Slider';
 
 import styles from '@/styles/Home.module.css';
 
-import { Board } from '@/app/types/board';
+import { Crossy } from '@/app/types/crossy';
 
-import { BoardContext, IBoardContext } from '@/app/contexts/boardcontext';
+import { CrossyJSONContext, ICrossyJSONContext } from '@/app/contexts/crossyjsoncontext';
 
 export default function DimensionSliders() {
-    const {board, setBoard} = useContext<IBoardContext>(BoardContext);
+    const {crossyJSON, setCrossyJSON} = useContext<ICrossyJSONContext>(CrossyJSONContext);
+    const crossy = new Crossy(crossyJSON);
     const handleChangeBoardSize = (rows: number, columns: number) => {
-        setBoard(new Board({rows: rows, columns: columns, oldBoard: board}));
+        crossy.setSize(rows, columns);
+        setCrossyJSON(crossy.toJSON());
     }
     return (
         <div>
@@ -21,11 +23,11 @@ export default function DimensionSliders() {
                     sx={{ width: "200px" }}
                     aria-label = "Rows"
                     valueLabelDisplay="auto"
-                    value = {board.rows}
+                    value = {crossy.rows}
                     min = {3}
                     max = {8}
                     marks = {true}
-                    onChange = {(e) => handleChangeBoardSize(Number((e.target as HTMLInputElement).value), board.columns)}
+                    onChange = {(e) => handleChangeBoardSize(Number((e.target as HTMLInputElement).value), crossy.columns)}
                 />
             </div>
             <br />
@@ -35,11 +37,11 @@ export default function DimensionSliders() {
                     sx={{ width: "200px" }}
                     aria-label = "Rows"
                     valueLabelDisplay="auto"
-                    value = {board.columns}
+                    value = {crossy.columns}
                     min = {3}
                     max = {8}
                     marks = {true}
-                    onChange = {(e) => handleChangeBoardSize(board.rows, Number((e.target as HTMLInputElement).value))}
+                    onChange = {(e) => handleChangeBoardSize(crossy.rows, Number((e.target as HTMLInputElement).value))}
                 />
             </div>
         </div>

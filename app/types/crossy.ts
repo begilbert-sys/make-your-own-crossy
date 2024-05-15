@@ -2,77 +2,94 @@ import { Coordinates } from '@/app/types/coordinates';
 
 export type Direction = "across" | "down";
 
-/* 
-Three paramater options for constructor a Board: 
-rows, columns - constructs a blank board of the specified size 
-rows, columns, oldBoard - copies an existing board
-string - initializes a board from a string 
-*/
 
-type params = {rows: number, columns: number, oldBoard?: Board} | string;
+export interface CrossyJSON {
+    title: string
+    author: string
+    boardString: string
+    acrossClues: string[]
+    downClues: string[]
+}
 
-export class Board {
+export const defaultCrossyJSON: CrossyJSON = {
+    title: "",
+    author: "",
+    boardString: "     \n     \n     \n     \n     ",
+    acrossClues: ["", "", "", "", ""],
+    downClues: ["", "", "", "", ""]
+}
+
+export class Crossy {
     static BLANK = ' ';
     static BLACKOUT = '.';
-    // the '!' is because typescript can't tell that the attributes are initialized in the constructor
-    // due to splitting contruction into multiple functions. so annoying.
-    private board!: string[][]
-    rows!: number
-    columns!: number
 
-    constructor(params: params) {
-        if (typeof params === "string") {
-            this.constructFromString(params);
-        } else {
-            this.constructFromBoard(params.rows, params.columns, params.oldBoard);
-        }
-    }
+    rows: number
+    columns: number
+    private title: string
+    private author: string
+    private board: string[][]
+    private acrossClues: string[]
+    private downClues: string[]
 
-    private constructFromBoard(rows: number, columns: number, oldBoard?: Board) {
-        /* 
-        construct a blank board
-        if oldBoard is provided, copy its contents
-        */
-        this.rows = rows;
-        this.columns = columns;
+    constructor(crossyJSON: CrossyJSON) {
+        this.title = crossyJSON.title;
+        this.author = crossyJSON.author;
+        this.acrossClues = crossyJSON.acrossClues;
+        this.downClues = crossyJSON.downClues;
+
+        const rowStrings = crossyJSON.boardString.split('\n');
+        this.rows = rowStrings.length;
+        this.columns = rowStrings[0].length;
         this.board = [];
-        for (let row = 0; row < rows; row++) {
-            let newRow = [];
-            for (let col = 0; col < columns; col++) {
-                if (oldBoard && row < oldBoard.rows && col < oldBoard.columns) {
-                    newRow.push(oldBoard.get(row, col));  
-                } else {
-                    newRow.push(Board.BLANK);
-                }
-            }
-            this.board.push(newRow);
-        }
-    }
-
-    private constructFromString(boardString: string) {
-        this.board = [];
-        const boardRows = boardString.split('\n').filter((row) => row !== '');
-        this.rows = boardRows.length;
-        this.columns = boardRows[0].length;
         for (let row = 0; row < this.rows; row++) {
-            const rowStr = boardRows[row];
             let newRow = [];
-            if (rowStr.length !== this.columns) {
-                throw new Error(`row "${rowStr}" must be length ${this.rows}`);
-            }
             for (let col = 0; col < this.columns; col++) {
-                const char = boardRows[row][col]
-                this.verifyChar(char);
-                newRow.push(char);
+                newRow.push(rowStrings[row][col]);
             }
             this.board.push(newRow);
         }
+    }
+
+    toJSON(): CrossyJSON {
+        let boardString = "";
+        for (let row = 0; row < this.rows; row++) {
+            for (let col = 0; col < this.columns; col++) {
+                boardString += this.get(row, col);
+            }
+            if (row !== this.rows - 1) {
+                boardString += '\n'
+            }
+        }
+
+        const newAcrossClues = [];
+        for (let i = 0; i < this.getWordList("across").length; i++) {
+            if (i > this.acrossClues.length) {
+                newAcrossClues.push("");
+            } else {
+                newAcrossClues.push(this.acrossClues[i]);
+            }
+        }
+        const newDownClues = [];
+        for (let i = 0; i < this.getWordList("down").length; i++) {
+            if (i > this.downClues.length) {
+                newDownClues.push("");
+            } else {
+                newDownClues.push(this.downClues[i]);
+            }
+        }
+        return ({
+            title: this.title,
+            author: this.author,
+            boardString: boardString,
+            acrossClues: newAcrossClues,
+            downClues: newDownClues
+        });
     }
 
     private verifyChar(char: string) {
         /* assert that all characters are lowercase alphabetical */
         const pattern = /^[a-z]$/
-        if (!pattern.test(char) && char !== Board.BLANK && char !== Board.BLACKOUT) {
+        if (!pattern.test(char) && char !== Crossy.BLANK && char !== Crossy.BLACKOUT) {
             throw new Error(`char: "${char}" is invalid`);
         }
     }
@@ -91,21 +108,22 @@ export class Board {
         return this.board[coord.row][coord.column];
     }
 
-    toString(): string {
-        /* note: this is used to pass the contents of the board into the C++ board generator */
-        let result = "";
-        for (let row = 0; row < this.rows; row++) {
-            for (let col = 0; col < this.columns; col++) {
-                const char = this.get(row, col);
-                if (char === Board.BLANK) {
-                    result += '_';
+    setSize(rows: number, columns: number) {
+        let newBoard = [];
+        for (let row = 0; row < rows; row++) {
+            let newRow = [];
+            for (let col = 0; col < columns; col++) {
+                if (row < this.rows - 1 && col < this.columns - 1) {
+                    newRow.push(this.get(row, col))
                 } else {
-                    result += this.get(row, col);
+                    newRow.push(Crossy.BLANK);
                 }
             }
-            result += '\n';
+            newBoard.push(newRow);
         }
-        return result;
+        this.board = newBoard;
+        this.rows = rows;
+        this.columns = columns;
     }
     clear(): void {
         /*
@@ -113,8 +131,8 @@ export class Board {
         */
         for (let row = 0; row < this.rows; row++) {
             for (let col = 0; col < this.columns; col++) {
-                if (this.get(row, col) !== Board.BLACKOUT) {
-                    this.set(row, col, Board.BLANK);
+                if (this.get(row, col) !== Crossy.BLACKOUT) {
+                    this.set(row, col, Crossy.BLANK);
                 }
             }
         }
@@ -167,7 +185,7 @@ export class Board {
                     reset = false;
                 }
                 let letter = this.get(row, column);
-                if (letter === Board.BLACKOUT) {
+                if (letter === Crossy.BLACKOUT) {
                     reset = true;
                     continue;
                 }
@@ -200,15 +218,15 @@ export class Board {
         */
         let row = coords.row;
         let column = coords.column;
-        if (this.getCoord(coords) === Board.BLACKOUT) {
+        if (this.getCoord(coords) === Crossy.BLACKOUT) {
             return Coordinates.NONE;
         }
         if (direction === "across") {
-            while (column > 0 && this.get(row, column - 1) !== Board.BLACKOUT) {
+            while (column > 0 && this.get(row, column - 1) !== Crossy.BLACKOUT) {
                 column--;
             }
         } else {
-            while (row > 0 && this.get(row - 1, column) !== Board.BLACKOUT) {
+            while (row > 0 && this.get(row - 1, column) !== Crossy.BLACKOUT) {
                 row--;
             }
         }
@@ -232,7 +250,7 @@ export class Board {
         if (direction === "across") {
             while (currentCoords.column < this.columns) {
                 const char = this.getCoord(currentCoords);
-                if (char === Board.BLACKOUT) {
+                if (char === Crossy.BLACKOUT) {
                     return word;
                 }
                 word += char;
@@ -241,7 +259,7 @@ export class Board {
         } else {
             while (currentCoords.row < this.rows) {
                 const char = this.getCoord(currentCoords);
-                if (char === Board.BLACKOUT) {
+                if (char === Crossy.BLACKOUT) {
                     return word;
                 }
                 word += char;

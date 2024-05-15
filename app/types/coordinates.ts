@@ -10,11 +10,4 @@ export class Coordinates {
     equals(other: Coordinates): boolean {
         return this.row === other.row && this.column === other.column;
     }
-    toString(): string {
-        return `${this.row}, ${this.column}`;
-    }
-    static fromString(coordsStr: string): Coordinates {
-        const [rowStr, colStr] = coordsStr.split(',');
-        return new Coordinates(parseInt(rowStr), parseInt(colStr));
-    }
 }

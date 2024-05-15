@@ -63,6 +63,9 @@ export default function Tools() {
                         <div className={symbolClass}>
                             <KeyboardArrowUpOutlinedIcon fontSize="small" />
                         </div>
+                        <div className={styles.keyboardKeyWrapper}>
+                        <div className={styles.keyboardKey}>Space</div>
+                        </div>
                     </div>
                 </li>
                 <li>

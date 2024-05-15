@@ -163,10 +163,6 @@
 	justify-content: space-between;
 	align-items: center;
 }
-.toolList .keyboardKey:first-child {
-	margin-left: 20px;
-
-}
 .toolText {
 	margin-right: 20px;
 }
@@ -206,4 +202,17 @@
 	width:100%;
 	display:flex;
 	justify-content:space-around;
+}
+
+.modalError {
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+	width: 400px;
+	padding:10px 20px;
+	background-color: white;
+	border: 2px solid #000;
+	border-radius: 10px;
+	box-shadow: 24px;
 }

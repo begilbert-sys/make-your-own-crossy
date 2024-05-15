@@ -1,7 +1,7 @@
 
 import sql from "@/app/api/db";
 
-import { Board } from '@/app/types/board';
+import { Board } from '@/app/types/crossy';
 import { Mini } from '@/app/types/mini';
 
 
@@ -11,6 +11,8 @@ const querydir = process.cwd() + "/app/api/queries/";
 export interface DBMiniRow {
     id: number, // the serial ID
     rand: number, // a random integer, generated when the row is inserted
+    title: string, // title of the puzzle
+    author: string, // author of the puzzle
     content: string, // the content of the board
     across_clues: string[], // the across clues 
     down_clues: string[] // the down clues 
@@ -34,8 +36,8 @@ function getHexID(dbID: number, dbRand: number): string {
 
 export async function add_mini(mini: Mini): Promise<string> {
     /* add a mini to the DB and return iuts generated hex ID */
-    const result = await sql.file(querydir + 'insert.sql', [mini.boardString, mini.acrossClues, mini.downClues]) as DBMiniRow[];
-    return getHexID(result[0].id, result[0].rand);
+    const result = (await sql.file(querydir + 'insert.sql', [mini.boardString, mini.acrossClues, mini.downClues]) as DBMiniRow[])[0];
+    return getHexID(result.id, result.rand);
 }
 
 export async function get_mini(hexID: string): Promise<DBMiniRow> {
@@ -43,6 +45,5 @@ export async function get_mini(hexID: string): Promise<DBMiniRow> {
     const [dbID, dbRand] = getDBIds(hexID);
     const result = (await sql.file(querydir + 'select.sql', [dbID, dbRand]) as DBMiniRow[])[0];
     result.content = result.content.replaceAll('_', Board.BLANK);
-    console.log(result);
     return result;
 }

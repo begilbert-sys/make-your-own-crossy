@@ -1,6 +1,18 @@
 body {
     font-family: Arial, Helvetica, sans-serif;
 }
+h2
 hr {
     margin: 20px 0;
+}
+header {
+    margin-left: 6%;
+    display:flex;
+    align-items:center;
+}
+
+header h2 {
+    margin-top: 10px;
+    margin-bottom:8px;
+    margin-left: 10px;
 }

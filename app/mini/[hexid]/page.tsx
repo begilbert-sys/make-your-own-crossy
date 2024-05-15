@@ -1,6 +1,5 @@
 import { get_mini } from '@/app/api/orm';
 
-import { Board } from '@/app/types/board';
 import { Mini } from '@/app/types/mini';
 
 
@@ -13,13 +12,17 @@ interface PageParams {
 export default async function Page({ params }: PageParams) {
     const DBRow = await get_mini("46fa4b672");
     const mini: Mini = {
+        title: DBRow.title,
+        author: DBRow.author,
         boardString: DBRow.content, 
         acrossClues: DBRow.across_clues,
         downClues: DBRow.down_clues
     }
     return (
+        <>
         <CrossySolver 
             mini={mini}
         />
+        </>
     );
 }

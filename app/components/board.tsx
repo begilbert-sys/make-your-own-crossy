@@ -5,8 +5,9 @@ import styles from '@/styles/Home.module.css';
 
 import { Coordinates } from '@/app/types/coordinates';
 import { Selection } from '@/app/types/selection';
+import { Crossy } from "@/app/types/crossy";
 
-import { BoardContext, IBoardContext } from '@/app/contexts/boardcontext';
+import { CrossyJSONContext, ICrossyJSONContext } from '@/app/contexts/crossyjsoncontext';
 import { SelectionContext, ISelectionContext } from '@/app/contexts/selectioncontext';
 
 import Square from '@/app/components/square';
@@ -51,7 +52,9 @@ interface BoardComponentProps {
 }
 export default function BoardComponent({buildMode}: BoardComponentProps) {
     const {selection, setSelection} = useContext<ISelectionContext>(SelectionContext);
-    const {board, setBoard} = useContext<IBoardContext>(BoardContext);
+    const {crossyJSON, setCrossyJSON} = useContext<ICrossyJSONContext>(CrossyJSONContext);
+
+    const crossy = new Crossy(crossyJSON);
     const clickWrapperRef = useRef<HTMLDivElement>(null);
     useOutsideClick(clickWrapperRef, setSelection);
 
@@ -71,17 +74,17 @@ export default function BoardComponent({buildMode}: BoardComponentProps) {
 
     let selectedWordCoords = null;
     if (!selection.coordinates.equals(Coordinates.NONE)) {
-        const wordStart = board.getWordStart(selection.coordinates, selection.direction);
+        const wordStart = crossy.getWordStart(selection.coordinates, selection.direction);
         if (!wordStart.equals(Coordinates.NONE)) {
             selectedWordCoords = wordStart;
         }
     }
-    const cornerValuesMap = board.getCornerValueMap();
-    for (let row = 0; row < board.rows; row++) {
+    const cornerValuesMap = crossy.getCornerValueMap();
+    for (let row = 0; row < crossy.rows; row++) {
         let rowArray = [];
-        for (let col = 0; col < board.columns; col++) {
+        for (let col = 0; col < crossy.columns; col++) {
             const coords = new Coordinates(row, col);
-            const shouldHighlight = (selectedWordCoords != null) && (selectedWordCoords.equals(board.getWordStart(coords, selection.direction)));
+            const shouldHighlight = (selectedWordCoords != null) && (selectedWordCoords.equals(crossy.getWordStart(coords, selection.direction)));
             const cornerValue = cornerValuesMap[row][col];
 
             rowArray.push(
