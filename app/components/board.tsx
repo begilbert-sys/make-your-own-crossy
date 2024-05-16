@@ -3,6 +3,8 @@ import RefObject, { useEffect, useRef, useContext } from 'react';
 
 import styles from '@/styles/Home.module.css';
 
+import { useOutsideClick } from "@/app/hooks/useoutsideclick";
+
 import { Coordinates } from '@/app/types/coordinates';
 import { Selection } from '@/app/types/selection';
 import { Crossy } from "@/app/types/crossy";
@@ -12,41 +14,6 @@ import { SelectionContext, ISelectionContext } from '@/app/contexts/selectioncon
 
 import Square from '@/app/components/square';
 
-
-function isClickable(target: EventTarget | null) {
-    /* 
-    return true if the element is a button or an input 
-    */
-    return (
-        (target as Element).closest("button") // if clicking a button
-        || (target instanceof HTMLTextAreaElement) // if clicking a textbox
-        || (target as HTMLDivElement).classList.contains("MuiInputBase-root") // if clicking a MUI textbox wrapper
-    )
-}
-
-function useOutsideClick(ref: RefObject.RefObject<HTMLDivElement>, setSelection: (f: Selection) => void) {
-    /*
-    When the user clicks anywhere outside of the board, the board's selection is de-focused
-    */
-    useEffect(() => {
-        function handleClickOutside(event: globalThis.MouseEvent) {
-            // clicking certain elements (buttons and inputd) shouldn't de-focus
-            if (ref.current && !ref.current.contains(event.target as Node) && !(isClickable(event.target))) {
-                // reset the selection / focus to nothing 
-                setSelection({
-                    coordinates: Coordinates.NONE,
-                    direction: "across",
-                    focus: false
-                })
-            }
-        }
-        document.addEventListener("mousedown", handleClickOutside);
-        return () => {
-            document.removeEventListener("mousedown", handleClickOutside);
-        };
-    }, [ref]);
-
-}
 interface BoardComponentProps {
     buildMode: boolean
 }
@@ -61,7 +28,7 @@ export default function BoardComponent({buildMode}: BoardComponentProps) {
     useEffect(() => {
         /* 
         sometimes when clicking on a square, the text inside of the square gets highlighted. 
-        this clears the highlight
+        this clears the highlight.
         */
         if (window.getSelection) {
             window.getSelection()!.removeAllRanges();

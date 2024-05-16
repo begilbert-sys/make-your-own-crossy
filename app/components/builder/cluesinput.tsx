@@ -9,10 +9,10 @@ import { Crossy, Direction } from '@/app/types/crossy';
 import { SelectionContext, ISelectionContext } from '@/app/contexts/selectioncontext';
 import { CrossyJSONContext, ICrossyJSONContext } from '@/app/contexts/crossyjsoncontext';
 
-interface ClueBoxProps {
+interface CluesInputProps {
     direction: Direction
 }
-export default function ClueBox({direction}: ClueBoxProps) {
+export default function CluesInput({direction}: CluesInputProps) {
     const {crossyJSON, setCrossyJSON} = useContext<ICrossyJSONContext>(CrossyJSONContext);
     const {selection, setSelection} = useContext<ISelectionContext>(SelectionContext);
 

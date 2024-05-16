@@ -18,8 +18,9 @@ export default async function Page({ params }: PageParams) {
         notFound();
     }
 
-
     return (
-        <p>{JSON.stringify(crossyJSON)}</p>
+        <CrossySolver 
+        solvedCrossyJSON = {crossyJSON}
+        />
     );
 }

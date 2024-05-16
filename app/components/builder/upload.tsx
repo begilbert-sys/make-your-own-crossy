@@ -5,6 +5,8 @@ import Button from '@mui/material/Button';
 import Modal from '@mui/material/Modal';
 import UploadIcon from '@mui/icons-material/Upload';
 
+import homeStyles from "@/styles/Home.module.css";
+
 import styles from '@/styles/Builder.module.css';
 
 import { Crossy, CrossyJSON } from "@/app/types/crossy";
@@ -80,7 +82,7 @@ export default function Upload() {
             aria-labelledby="modal-modal-title"
             aria-describedby="modal-modal-description"
         >
-            <div className={styles.modalError}>
+            <div className={homeStyles.modal}>
                 <h2 id="modal-modal-title">Upload Error</h2>
                 <p id="modal-modal-description">{modalError}</p>
             </div>

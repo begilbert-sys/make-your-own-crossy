@@ -78,6 +78,7 @@
 
 .sidebarWrapper {
 	margin-right: 40px;
+	width: 373px;
 }
 
 .clueBox {
@@ -88,6 +89,7 @@
 	padding-right: 20px;
 	padding-left: 10px;
 	height: 495px;
+	width: 220px;
 }
 
 .clueHeader {
@@ -115,6 +117,25 @@
 }
 .clue:first-child {
 	margin-top: 20px;
+}
+/* top right bottom left */
+.clueDisplay { 
+    margin-bottom: 0px;
+	padding: 10px 0px 10px 15px;
+	border-radius: 3px;
+	border-width: 2px;
+	border-style: solid;
+	border-color: white;
+	cursor: pointer;
+}
+
+.clueDisplay::before {
+	position: static;
+}
+
+.clueDisplayHighlighted {
+	background-color: #A7D8FF;
+	border-color: #ccc;
 }
 
 .clueTextbox {
@@ -170,4 +191,21 @@
 }
 .toolText {
 	margin-right: 20px;
+}
+
+.modal {
+    position: absolute;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+	width: 400px;
+	padding:10px 20px;
+	background-color: white;
+	border: 2px solid #000;
+	border-radius: 10px;
+	box-shadow: 24px;
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	align-items: center;
 }

@@ -218,7 +218,7 @@ export class Crossy {
         */
         let row = coords.row;
         let column = coords.column;
-        if (this.getCoord(coords) === Crossy.BLACKOUT) {
+        if (coords.equals(Coordinates.NONE) || this.getCoord(coords) === Crossy.BLACKOUT) {
             return Coordinates.NONE;
         }
         if (direction === "across") {

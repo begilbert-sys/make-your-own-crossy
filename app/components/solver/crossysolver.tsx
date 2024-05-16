@@ -1,43 +1,80 @@
 'use client';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+
 import styles from '@/styles/Home.module.css';
 
-import { Board } from '@/app/types/crossy';
+
+import { useStopwatch } from "@/app/hooks/usetimer";
+
+import { Crossy, CrossyJSON } from '@/app/types/crossy';
 import { Coordinates } from '@/app/types/coordinates';
 import { Selection } from '@/app/types/selection';
-import { Clues } from '@/app/types/clues';
-import { Mini } from '@/app/types/mini';
 
 
-import { BoardContext } from '@/app/contexts/crossyjsoncontext';
+import { CrossyJSONContext } from '@/app/contexts/crossyjsoncontext';
 import { SelectionContext } from '@/app/contexts/selectioncontext';
 
-import BoardComponent from "@/app/components/board";
+import Header from "@/app/components/header";
+import Board from "@/app/components/board";
+import Controls from "@/app/components/solver/controls";
+import Title from "@/app/components/solver/title";
+
+import Clues from "@/app/components/solver/clues";
+
+import Timer from "@/app/components/solver/timer";
 
 
 interface CrossySolverProps {
-    mini: Mini
+    solvedCrossyJSON: CrossyJSON
 }
-export default function CrossySolver({mini}: CrossySolverProps) {
-    const solvedBoard = new Board(mini.boardString);
-    const clearedBoard = new Board({rows: solvedBoard.rows, columns: solvedBoard.columns, oldBoard: solvedBoard});
-    clearedBoard.clear();
-    const [board, setBoard] = useState<Board>(clearedBoard);
+export default function CrossySolver({solvedCrossyJSON}: CrossySolverProps) {
+    const solvedCrossy = new Crossy(solvedCrossyJSON);
+    const clearedCrossy = new Crossy(solvedCrossyJSON);
+    clearedCrossy.clear();
+    const [crossyJSON, setCrossyJSON] = useState<CrossyJSON>(clearedCrossy.toJSON());
     const [selection, setSelection] = useState<Selection>({
         coordinates: Coordinates.NONE,
         direction: "across",
         focus: false
     });
-    return (
-        <div className={styles.layout}>
-            <SelectionContext.Provider value = {{selection, setSelection}}>
-            <BoardContext.Provider value = {{board, setBoard}}>
 
-                <BoardComponent 
+    const {timeElapsed, startTimer, stopTimer, resetTimer} = useStopwatch();
+    useEffect(() => startTimer(), []);
+
+    return (
+        <>
+        
+        <Header />
+        <SelectionContext.Provider value = {{selection, setSelection}}>
+        <CrossyJSONContext.Provider value = {{crossyJSON, setCrossyJSON}}>
+        <div className={styles.layout}>
+            <div className={styles.sidebarWrapper}>
+                <Title />
+                <hr />
+                <Timer
+                    timeElapsed = {timeElapsed}
+                    startTimer = {startTimer}
+                    stopTimer = {stopTimer}
+                    resetTimer = {resetTimer}
+                />
+                <hr />
+                <Controls />
+                <hr />
+            </div>
+            <div>
+                <Board
                     buildMode = {false}
                 />
-            </BoardContext.Provider>
-            </SelectionContext.Provider>
+            </div>
+            <Clues 
+                direction = {"across"}
+            />
+            <Clues
+                direction = {"down"}
+            />
         </div>
+        </CrossyJSONContext.Provider>
+        </SelectionContext.Provider>
+        </>
     )
 }

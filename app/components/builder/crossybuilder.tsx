@@ -11,7 +11,7 @@ import { SelectionContext } from '@/app/contexts/selectioncontext';
 
 import Board from "@/app/components/board";
 import DimensionSliders from "@/app/components/builder/dimensionsliders";
-import ClueBox from "@/app/components/builder/cluebox";
+import CluesInput from "@/app/components/builder/cluesinput";
 import WordFinder from "@/app/components/builder/wordfinder";
 import AutoFill from "@/app/components/builder/autofill";
 import Tools from "@/app/components/builder/tools";
@@ -57,10 +57,10 @@ export default function CrossyBuilder() {
                                     <Upload/>
                             </div>
                         </div>
-                        <ClueBox 
+                        <CluesInput
                             direction = {"across"}
                         />
-                        <ClueBox 
+                        <CluesInput
                             direction = {"down"}
                         />
                     </div>

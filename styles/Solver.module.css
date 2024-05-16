@@ -1,0 +1,50 @@
+.crossyTitle {
+    width: 60%;
+    display: flex;
+    flex-direction: column;
+    align-items:center;
+}
+
+.time {
+    font-size:20px;
+    font-weight: 600;
+    width: 17px;
+}
+
+.timer {
+    display:flex;
+    justify-content: space-between;
+}
+
+.solverButton {
+	background: none;
+	color: inherit;
+	border: none;
+	padding: 0;
+	font: inherit;
+	cursor: pointer;
+	outline: inherit;
+    display: flex;
+    align-items:center;
+    font-size:20px;
+}
+
+.pauseIcon {
+    transform: scale(1.4);
+}
+
+.continueButton {
+    height: 55px;
+    width: 170px;
+    font-size: 15px;
+    border-style:solid;
+    border-width: 2px;
+    border-color: black;
+    border-radius: 50px;
+    color: white;
+    background-color: black;
+}
+.continueButton:hover {
+    background-color: #444;
+    border-color: #444;
+}

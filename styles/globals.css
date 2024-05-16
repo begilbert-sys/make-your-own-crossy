@@ -17,3 +17,8 @@ header h2 {
     margin-bottom:8px;
     margin-left: 10px;
 }
+
+h1 {
+    font-size: 40px;
+    margin:0;
+}
