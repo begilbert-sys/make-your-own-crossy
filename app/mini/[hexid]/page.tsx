@@ -12,16 +12,16 @@ function isValidHex(hexString: string) {
 }
 
 interface PageParams {
-    params: { hexID: string }
+    params: { hexid: string }
 }
 
 export default async function Page({ params }: PageParams) {
-    if (!isValidHex(params.hexID)) {
+    if (!isValidHex(params.hexid)) {
         console.log("invalid HEX");
         console.log(params);
         notFound();
     }
-    const crossyJSON = await get_mini(params.hexID) as CrossyJSON | undefined;
+    const crossyJSON = await get_mini(params.hexid) as CrossyJSON | undefined;
     // 404 if a crossword couldn't be found in the DB
     if (crossyJSON == undefined) {
         console.log("undefined crossy");
