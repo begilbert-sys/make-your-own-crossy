@@ -18,7 +18,7 @@ interface PageParams {
 export default async function Page({ params }: PageParams) {
     if (!isValidHex(params.hexID)) {
         console.log("invalid HEX");
-        console.log(params.hexID);
+        console.log(params);
         notFound();
     }
     const crossyJSON = await get_mini(params.hexID) as CrossyJSON | undefined;
