@@ -50,6 +50,12 @@
     height: calc(100% + 3px);
 }
 
+.aboutWrapper {
+	width: 60%;
+	margin: 0 auto;
+	line-height: 1.5;
+}
+
 .layout {
 	width: 100%;
 	display: flex;

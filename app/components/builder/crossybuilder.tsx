@@ -28,7 +28,6 @@ export default function CrossyBuilder() {
         direction: "across",
         focus: false
     });
-    console.log(crossyJSON);
 
     return (
     <>

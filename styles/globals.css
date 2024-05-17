@@ -8,11 +8,14 @@ hr {
 
 a {
     color:black;
-    text-decoration:none;
 }
 
 a:hover {
     color:#7c7c7c;
+}
+
+header a {
+    text-decoration:none;
 }
 
 header {

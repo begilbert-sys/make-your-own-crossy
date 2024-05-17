@@ -20,7 +20,6 @@ export async function generateBoard(crossyJSON: CrossyJSON): Promise<CrossyJSON>
     const outputString = Module.UTF8ToString(outputPtr);
     Module._free(outputPtr);
     crossyJSON.boardString = outputString;
-    console.log(outputString);
     return {...crossyJSON};
 
 }

@@ -49,7 +49,6 @@ export default function Upload() {
         const crossyError = verifyCrossword(crossyJSON);
         if (crossyError != UploadError.NONE) {
             setModalError(crossyError);
-            console.log(crossyJSON);
             return;
         }
         const res = await fetch("/api/", {
