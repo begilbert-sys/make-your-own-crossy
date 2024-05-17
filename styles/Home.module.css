@@ -1,3 +1,55 @@
+.logo {
+	display:flex;
+	flex-direction: row;
+	justify-content:flex-start;
+	align-items: center;
+	color: black;
+}
+
+.headerWrapper {
+	width: 30%;
+    margin-left: 6%;
+    display:flex;
+    justify-content: space-between;
+    align-items:flex-end;
+}
+
+.githubWrapper {
+	width: 60%;
+	display:flex;
+	justify-content:flex-end;
+	align-items:flex-end;
+}
+.link {
+    font-size: 18px;
+    text-decoration:none;
+}
+
+.linkWrapper {
+	height: 30px;
+	position:relative;
+	transition: 0.5s;
+}
+
+.linkWrapper:hover {
+	transform: translateY(-3px);
+	transition: 0.3s;
+	cursor: pointer;
+}
+/* these elements stop the link animation from glitching */
+.linkWrapper:before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 100%;
+}
+  
+.linkWrapper:hover::before {
+    height: calc(100% + 3px);
+}
+
 .layout {
 	width: 100%;
 	display: flex;
@@ -116,12 +168,12 @@
 
 }
 .clue:first-child {
-	margin-top: 20px;
+	margin-top: 10px;
 }
 /* top right bottom left */
 .clueDisplay { 
     margin-bottom: 0px;
-	padding: 10px 0px 10px 15px;
+	padding: 6px 0px 6px 15px;
 	border-radius: 3px;
 	border-width: 2px;
 	border-style: solid;
@@ -199,7 +251,7 @@
 	left: 50%;
 	transform: translate(-50%, -50%);
 	width: 400px;
-	padding:10px 20px;
+	padding:10px 20px 30px;
 	background-color: white;
 	border: 2px solid #000;
 	border-radius: 10px;
@@ -208,4 +260,12 @@
 	flex-direction: column;
 	justify-content: center;
 	align-items: center;
+}
+
+.bottomButtons {
+	height: 45px;
+	margin-top: 20px;
+	width:100%;
+	display:flex;
+	justify-content:space-around;
 }

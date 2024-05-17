@@ -16,6 +16,7 @@ import { SelectionContext } from '@/app/contexts/selectioncontext';
 
 import Header from "@/app/components/header";
 import Board from "@/app/components/board";
+import CompletionModal from "@/app/components/solver/completionmodal";
 import Controls from "@/app/components/solver/controls";
 import Title from "@/app/components/solver/title";
 
@@ -39,7 +40,13 @@ export default function CrossySolver({solvedCrossyJSON}: CrossySolverProps) {
     });
 
     const {timeElapsed, startTimer, stopTimer, resetTimer} = useStopwatch();
+    
+    // start the timer on the first render
     useEffect(() => startTimer(), []);
+
+    // check if the crossword has been completed
+    const [completed, setCompleted] = useState<boolean>(false);
+    
 
     return (
         <>
@@ -47,6 +54,13 @@ export default function CrossySolver({solvedCrossyJSON}: CrossySolverProps) {
         <Header />
         <SelectionContext.Provider value = {{selection, setSelection}}>
         <CrossyJSONContext.Provider value = {{crossyJSON, setCrossyJSON}}>
+        <CompletionModal 
+            solvedCrossyJSON = {solvedCrossyJSON}
+            timeElapsed = {timeElapsed}
+            startTimer = {startTimer}
+            stopTimer = {stopTimer}
+
+        />
         <div className={styles.layout}>
             <div className={styles.sidebarWrapper}>
                 <Title />

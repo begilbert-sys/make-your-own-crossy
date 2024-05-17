@@ -1,5 +1,5 @@
 .crossyTitle {
-    width: 60%;
+    width: 80%;
     display: flex;
     flex-direction: column;
     align-items:center;
@@ -47,4 +47,19 @@
 .continueButton:hover {
     background-color: #444;
     border-color: #444;
+}
+
+.goBackButton {
+    color: black;
+    background-color: white;
+}
+
+.goBackButton:hover {
+    background-color: #f4f4f4;
+}
+
+.restartModalButtonWrapper {
+    display:flex;
+    justify-content:space-between;
+    width: 375px;
 }

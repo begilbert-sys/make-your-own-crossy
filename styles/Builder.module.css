@@ -43,11 +43,3 @@
 	margin-right: 100px;
 	width: 395px;
 }
-
-.bottomButtons {
-	height: 45px;
-	margin-top: 20px;
-	width:100%;
-	display:flex;
-	justify-content:space-around;
-}

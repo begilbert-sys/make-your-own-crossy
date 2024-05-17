@@ -26,6 +26,7 @@ export function useStopwatch() {
 
     function resetTimer() {
         setTimeElapsed(0);
+        startTimer();
     }
 
     return { timeElapsed, startTimer, stopTimer, resetTimer };

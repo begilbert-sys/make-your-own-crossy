@@ -23,7 +23,9 @@ export default function BoardComponent({buildMode}: BoardComponentProps) {
 
     const crossy = new Crossy(crossyJSON);
     const clickWrapperRef = useRef<HTMLDivElement>(null);
-    useOutsideClick(clickWrapperRef, setSelection);
+    if (buildMode) {
+        useOutsideClick(clickWrapperRef, setSelection);
+    }
 
     useEffect(() => {
         /* 

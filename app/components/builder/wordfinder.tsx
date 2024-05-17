@@ -6,7 +6,7 @@ import Button from '@mui/material/Button';
 import CachedIcon from '@mui/icons-material/Cached';
 
 import wordBank from "@/data/wordbank.json"
-import styles from '@/styles/Home.module.css';
+import styles from '@/styles/Builder.module.css';
 
 import { Crossy }from '@/app/types/crossy';
 import { Coordinates } from "@/app/types/coordinates";

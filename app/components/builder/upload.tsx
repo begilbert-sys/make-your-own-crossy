@@ -68,7 +68,6 @@ export default function Upload() {
     return (
         <>
         <Button
-            sx={{backgroundColor: "green"}}
             variant="contained" 
             onClick={() => handleBoardUpload()}
         >

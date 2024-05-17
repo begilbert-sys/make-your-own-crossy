@@ -5,6 +5,7 @@ import Button from "@mui/material/Button";
 import Modal from '@mui/material/Modal';
 
 import PauseIcon from '@mui/icons-material/Pause';
+import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 
 import homeStyles from "@/styles/Home.module.css";
 
@@ -13,9 +14,8 @@ import styles from "@/styles/Solver.module.css";
 interface PauseButtonProps {
     startTimer: () => void,
     stopTimer: () => void
-    resetTimer: () => void
 }
-export default function PauseButton({startTimer, stopTimer, resetTimer}: PauseButtonProps) {
+export default function PauseButton({startTimer, stopTimer}: PauseButtonProps) {
     const [paused, setPaused] = useState<boolean>(false);
 
     const handleOpen = () => {
@@ -31,7 +31,11 @@ export default function PauseButton({startTimer, stopTimer, resetTimer}: PauseBu
     return (
         <>
         <button className={styles.solverButton} onClick={handleOpen}>
-            <PauseIcon className={styles.pauseIcon}/>
+            {paused ? (
+                <PlayArrowIcon className={styles.pauseIcon} />
+            ) : (
+                <PauseIcon className={styles.pauseIcon}/>
+            )}
         </button>
 
         <Modal
@@ -50,5 +54,5 @@ export default function PauseButton({startTimer, stopTimer, resetTimer}: PauseBu
             </div>
         </Modal>
         </>
-    )
+    );
 }

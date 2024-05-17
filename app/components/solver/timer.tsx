@@ -4,6 +4,8 @@ import styles from "@/styles/Solver.module.css";
 
 import PauseButton from "@/app/components/solver/pausebutton";
 
+import RestartButton from "@/app/components/solver/restartbutton";
+
 
 function displayTime(time: number) {
     const elapsed_seconds = time / 1000;
@@ -31,11 +33,12 @@ export default function Timer({timeElapsed, startTimer, stopTimer, resetTimer}: 
             <PauseButton 
                 startTimer = {startTimer}
                 stopTimer = {stopTimer}
+            />
+            <RestartButton
+                startTimer = {startTimer}
+                stopTimer = {stopTimer}
                 resetTimer = {resetTimer}
             />
-            <button className={styles.solverButton}>
-                <RestartAltIcon className={styles.pauseIcon}/>
-            </button>
         </div>
     )
 }

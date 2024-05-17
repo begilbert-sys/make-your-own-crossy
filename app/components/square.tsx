@@ -58,6 +58,32 @@ export default function Square({coords, highlighted, cornerValue, buildMode} : S
             return coords.row === 0 ? new Coordinates(crossy.rows - 1, coords.column - 1) : new Coordinates(coords.row - 1, coords.column);
         }
     }
+    const getNextLetter = (): Coordinates => {
+        if (selection.direction === "across") {
+            if (coords.column === crossy.columns - 1 || crossy.get(coords.row, coords.column + 1) === Crossy.BLACKOUT) {
+                return coords;
+            }
+            return new Coordinates(coords.row, coords.column + 1);
+        } else {
+            if (coords.row === crossy.rows - 1 || crossy.get(coords.row + 1, coords.column) === Crossy.BLACKOUT) {
+                return coords;
+            }
+            return new Coordinates(coords.row + 1, coords.column);
+        }
+    }
+    const getPrevLetter = (): Coordinates => {
+        if (selection.direction === "across") {
+            if (coords.column === 0 || crossy.get(coords.row, coords.column - 1) === Crossy.BLACKOUT) {
+                return coords;
+            }
+            return new Coordinates(coords.row, coords.column - 1);
+        } else {
+            if (coords.row === 0 || crossy.get(coords.row - 1, coords.column) === Crossy.BLACKOUT) {
+                return coords;
+            }
+            return new Coordinates(coords.row - 1, coords.column);
+        }
+    }
 
     /* 
     event handlers
@@ -78,7 +104,11 @@ export default function Square({coords, highlighted, cornerValue, buildMode} : S
             case "Backspace":
                 /* delete square value and move one square back */
                 setChar(Crossy.BLANK);
-                modifiedSelection.coordinates = getPrevSquare();
+                if (buildMode) {
+                    modifiedSelection.coordinates = getPrevSquare();
+                } else {
+                    modifiedSelection.coordinates = getPrevLetter();
+                }
                 break;
 
             case "Enter":
@@ -90,7 +120,7 @@ export default function Square({coords, highlighted, cornerValue, buildMode} : S
                 if (wordCoords == Coordinates.NONE) {
                     break;
                 }
-                const index = crossy.getWordListIndex(coords, selection.direction);
+                const index = crossy.getWordListIndex(wordCoords, selection.direction);
                 // if it's the last word on the board, switch the direction and jump to the beginning of the board
                 let coordsString;
                 if (index === coordsList.length - 1 && otherCoordsList.length !== 0) {
@@ -179,7 +209,11 @@ export default function Square({coords, highlighted, cornerValue, buildMode} : S
                 /* if the keypress was a letter, assign the square to that letter */
                 if (e.key.length === 1 && e.key.match(/[a-zA-Z]/)) {
                     setChar(e.key.toLowerCase());
-                    modifiedSelection.coordinates = getNextSquare();
+                    if (buildMode) {
+                        modifiedSelection.coordinates = getNextSquare();
+                    } else {
+                        modifiedSelection.coordinates = getNextLetter();
+                    }
                 }
         }
         setSelection(modifiedSelection);
