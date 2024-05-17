@@ -22,9 +22,10 @@
 	display:flex;
 	margin: 0 auto;
 }
+
 .generatorTooltip {
 	position: absolute;
-	left: 380px;
+	left: 635px;
 }
 
 
