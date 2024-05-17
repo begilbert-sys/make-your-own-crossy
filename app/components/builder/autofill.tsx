@@ -26,28 +26,30 @@ export default function AutoFill() {
     
     return (
         <div>
-            <div className={styles.generatorTooltip}>
-                <Tooltip 
-                    arrow
-                    title="If the generator is taking too long, try adding a few black boxes"
-                    placement="top"
-                    componentsProps={{
-                        tooltip: {
-                            sx: {
-                                textAlign: "center",
-                                maxWidth: "200px",
-                                fontSize: "12px"
+            <div className={styles.autoFillTitleWrapper}>
+                <h3 className={styles.autoFillTitle}>Feeling Lazy?</h3>
+                <div className={styles.generatorTooltip}>
+                    <Tooltip 
+                        arrow
+                        title="If the generator is taking too long, try adding a few black boxes"
+                        placement="top"
+                        componentsProps={{
+                            tooltip: {
+                                sx: {
+                                    textAlign: "center",
+                                    maxWidth: "200px",
+                                    fontSize: "12px"
+                                }
                             }
-                        }
-                    }}
+                        }}
 
-                >
-                    <InfoOutlinedIcon
-                        sx = {{height: "20px"}}
-                    />
-                </Tooltip>
+                    >
+                        <InfoOutlinedIcon
+                            sx = {{height: "20px"}}
+                        />
+                    </Tooltip>
+                </div>
             </div>
-            <h3>Feeling Lazy?</h3>
             <p>The autofiller can try to generate a board for you!</p>
             <Button className={styles.generateBoardButton} variant="contained" onClick={handleClick}>
                 {loading ? (

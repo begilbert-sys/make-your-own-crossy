@@ -23,9 +23,20 @@
 	margin: 0 auto;
 }
 
+.autoFillTitleWrapper {
+	display:flex;
+	justify-content:space-between;
+	align-items: center;
+	width:100%;
+	margin: 0;
+}
+
+.autoFillTitle {
+	margin: 0;
+}
+
 .generatorTooltip {
-	position: absolute;
-	left: 635px;
+
 }
 
 
