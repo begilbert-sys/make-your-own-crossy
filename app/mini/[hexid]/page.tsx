@@ -17,11 +17,13 @@ interface PageParams {
 
 export default async function Page({ params }: PageParams) {
     if (!isValidHex(params.hexID)) {
+        console.log("invalid HEX");
         notFound();
     }
     const crossyJSON = await get_mini(params.hexID) as CrossyJSON | undefined;
     // 404 if a crossword couldn't be found in the DB
     if (crossyJSON == undefined) {
+        console.log("undefined crossy");
         notFound();
     }
 
