@@ -16,7 +16,7 @@ export default function DimensionSliders() {
     }
     return (
         <div>
-            <h3>Change your board's size</h3>
+            <h3>Change your board&apos;s size</h3>
             <div className={styles.sliderRow}>
                 <span style={{marginRight: "55px"}}>Rows</span>
                 <Slider
