@@ -11,7 +11,7 @@ EMFLAGS = -sSINGLE_FILE=1 -sENVIRONMENT=web -sMODULARIZE=1 -sEXPORTED_FUNCTIONS=
 srcdir := ./src
 outdir := ./out
 
-OBJECTS := $(outdir)/strutil.o $(outdir)/randutil.o $(outdir)/fixedtrie.o $(outdir)/board.o $(outdir)/solver.o
+OBJECTS := $(outdir)/strutil.o $(outdir)/randutil.o $(outdir)/node.o $(outdir)/board.o $(outdir)/boardtries.o $(outdir)/solver.o
 
 generator.js: $(outdir)/main.o
 	em++ $(FLAGS) $(outdir)/main.o $(OBJECTS) -o generator.js $(EMFLAGS)

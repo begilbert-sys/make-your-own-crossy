@@ -1,4 +1,6 @@
-<a href="https://make-your-own-crossy.vercel.app/about">Make Your Own Crossword</a>
+[Make Your Own Crossword](https://make-your-own-crossy.vercel.app/)
+
+
 A website for building your own mini crosswords. 
 Written in React/TypeScript using the NextJS framework.
 

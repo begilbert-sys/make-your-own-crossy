@@ -1,100 +1,79 @@
 #include "solver.h"
-void Solver::build_tries(std::string filename) {
-    std::ifstream file(filename);
 
-    std::string line;
-
-    if (file.is_open()) {
-        while (getline(file, line)) {
-            int len = (int)line.length();
-            if (len <= WORD_MAX && len >= WORD_MIN && strutil::islower(line)) {
-                int trie_index = len - WORD_MIN;
-
-                FixedTrie* trie = fixedtrie_array[trie_index];
-
-                trie->add(line);
-                words.push_back(line);
-            }
-        }
-        file.close();
-    } else {
-        throw std::invalid_argument("file: \"" + filename + "\" could not be found");
-    }
-}
-
-
-Solver::Solver(std::string filename) {
-    for (int i = 0; i < FIXEDTRIES; i++) {
-        fixedtrie_array[i] = new FixedTrie(i + WORD_MIN);
-    }
-    build_tries(filename);
-}
-
-Solver::~Solver() {
-    for (int i = 0; i < FIXEDTRIES; i++) {
-        delete fixedtrie_array[i];
-    }
-}
-
-Coordinate Solver::next_coordinate(Coordinate coord, Board& board) {
-    if (coord.column == board.columns - 1) {
-        return {coord.row + 1, 0};
-    }
-    return {coord.row, coord.column + 1};
-}
-
-bool Solver::recur(Coordinate coord, Board& board, Matrix<NodeBookmark>& DP) {
+struct CachedNodes {
+    Node* across;
+    Node* down;
     
-    char original_value = board.get(coord);
-    const NodeBookmark& bookmark = DP.get(coord);
-    
-    bool final_square = (coord.row == board.rows - 1) && (coord.column == board.columns - 1);
+};
+
+
+/* Fetch the next coordinate on the board.
+ I'm not good enough at C++ to know if inline actually makes a difference here. Probably not.
+*/
+inline Coordinates next_coordinate(Coordinates coords, Board& board) {
+    if (coords.column == board.columns - 1) {
+        return {coords.row + 1, 0};
+    }
+    return {coords.row, coords.column + 1};
+}
+
+bool recur(Coordinates coords, Board& board, BoardTries& boardtries, Matrix<CachedNodes>& node_cache) {
+    char original_value = board.get(coords);
+    bool final_square = (coords.row == board.rows - 1) && (coords.column == board.columns - 1);
+    // skip the square if it's blacked out
     if (original_value == BLACKOUT) {
         if (final_square) {
             return true;
         }
-        return recur(next_coordinate(coord, board), board, DP);
+        return recur(next_coordinate(coords, board), board, boardtries, node_cache);
     }
-      
-    // lambda for gathering info on the previous nodes
-    auto get_prev_node = [&](Board::Direction direction) -> Node* {
-        int word_length = (direction == Board::Direction::ACROSS) ? bookmark.across_word_length : bookmark.down_word_length;
-        // if the current square is NOT the beginning of an across word, assign left_node to the previous letter's node
-        if (word_length == 0) {
-            if (direction == Board::Direction::ACROSS) {
-                return DP.get({coord.row, coord.column - 1}).across;
-            } else {
-                return DP.get({coord.row - 1, coord.column}).down;
-            }
-            
-        } else {
-            // if the current square IS the beginning of an across word. . .
-            // if the length is greater than 2, assign it to the head of a trie
-            if (word_length > 2) {
-                return fixedtrie_array[word_length - WORD_MIN]->head;
-            } else {
-                return nullptr;
-            }
+    
+    // important vars
+    int across_index  = board.get_word_index(coords, ACROSS);
+    int across_length = board.get_word_length(coords, ACROSS);
+    int down_index    = board.get_word_index(coords, DOWN);
+    int down_length   = board.get_word_length(coords, DOWN);
+    
+    
+    // lambda for retrieving the left/top cached nodes
+    auto get_prev_node = [&](Direction direction) -> Node* {
+        int word_length = (direction == ACROSS) ? (across_length) : (down_length);
+        if (word_length == -1) {
+            // this means the word length is less than 3 and should be ignored
+            return nullptr;
         }
+        if ((direction == ACROSS && coords.column == 0) || (direction == DOWN && coords.row == 0)) {
+            return boardtries.get_head(word_length);
+        }
+        
+        Node* prev_node = (direction == ACROSS) ? (node_cache.get({coords.row, coords.column - 1}).across) : (node_cache.get({coords.row - 1, coords.column}).down);
+        // in this case, the previous node was a BLACKOUT square
+        if (prev_node == nullptr) {
+            return boardtries.get_head(word_length);
+        }
+        return prev_node;
     };
-
     
-    Node* left_node = get_prev_node(Board::Direction::ACROSS);
-    Node* top_node = get_prev_node(Board::Direction::DOWN);
+    Node* left_node = get_prev_node(ACROSS);
+    Node* top_node = get_prev_node(DOWN);
     
+    if ((across_index != -1 && !left_node->is_path_allowed(across_index, ACROSS)) ||
+        (down_index != -1 && !top_node->is_path_allowed(down_index, DOWN))) {
+        return false;
+    }
     
-    // lambda sets the square to a specific letter and solves from there
+    // this lambda sets the square to a specific letter and solves from there
     auto attempt_solve = [&](char letter) -> bool {
-        int index = letter - 'a';
-        board.set(coord, letter);
+        
+        board.set(coords, letter);
         if (final_square) {
             return true;
         }
         
         Node* next_left_node = nullptr;
         if (left_node != nullptr) {
-            next_left_node = left_node->node_array[index];
-            if (next_left_node != nullptr && next_left_node->unique) {
+            next_left_node = left_node->get_next_node(letter);
+            if (next_left_node->unique) {
                 if (next_left_node->visited) {
                     return false;
                 }
@@ -103,10 +82,10 @@ bool Solver::recur(Coordinate coord, Board& board, Matrix<NodeBookmark>& DP) {
         }
         Node* next_top_node = nullptr;
         if (top_node != nullptr) {
-            next_top_node = top_node->node_array[index];
-            if (next_top_node != nullptr && next_top_node->unique) {
+            next_top_node = top_node->get_next_node(letter);
+            if (next_top_node->unique) {
                 if (next_top_node->visited) {
-                    if (next_left_node->visited) {
+                    if (left_node != nullptr && next_left_node->visited) {
                         next_left_node->visited = false;
                     }
                     return false;
@@ -114,14 +93,14 @@ bool Solver::recur(Coordinate coord, Board& board, Matrix<NodeBookmark>& DP) {
                 next_top_node->visited = true;
             }
         }
-        DP.set(coord, {next_left_node, next_top_node, bookmark.across_word_length, bookmark.down_word_length});
-        bool result = recur(next_coordinate(coord, board), board, DP);
         
+        node_cache.set(coords, {next_left_node, next_top_node});
+        bool result = recur(next_coordinate(coords, board), board, boardtries, node_cache);
         // remove blocked nodes
-        if (next_left_node->visited) {
+        if (left_node != nullptr && next_left_node->visited) {
             next_left_node->visited = false;
         }
-        if (next_top_node->visited) {
+        if (top_node != nullptr && next_top_node->visited) {
             next_top_node->visited = false;
         }
         return result;
@@ -136,6 +115,7 @@ bool Solver::recur(Coordinate coord, Board& board, Matrix<NodeBookmark>& DP) {
                 return true;
             }
         }
+        board.set(coords, original_value);
         return false;
     }
     else if (top_node == nullptr) {
@@ -144,70 +124,52 @@ bool Solver::recur(Coordinate coord, Board& board, Matrix<NodeBookmark>& DP) {
                 return true;
             }
         }
+        board.set(coords, original_value);
         return false;
     }
     
     if (original_value == BLANK) {
-        Node* outer_node;
-        Node* inner_node;
         if (left_node->char_list.length() > top_node->char_list.length()) {
-            outer_node = top_node;
-            inner_node = left_node;
+            for (const char& letter : top_node->char_list) {
+                if (left_node->get_next_node(letter) != nullptr) {
+                    if (attempt_solve(letter)) {
+                        return true;
+                    };
+                }
+            }
+            
         } else {
-            outer_node = left_node;
-            inner_node = top_node;
-        }
-
-        for (const char& letter : outer_node->char_list) {
-            int index = letter - 'a';
-            if (inner_node->node_array[index] != nullptr) {
-                if (attempt_solve(letter)) {
-                    return true;
-                };
+            for (const char& letter : left_node->char_list) {
+                if (top_node->get_next_node(letter) != nullptr) {
+                    if (attempt_solve(letter)) {
+                        return true;
+                    };
+                }
             }
         }
     }
     else {
-        int index = original_value - 'a';
-        Node* top_node_result = top_node->node_array[index];
-        Node* left_node_result = left_node->node_array[index];
-        if (top_node_result != nullptr && left_node_result != nullptr) {
+        if (left_node->get_next_node(original_value) != nullptr &&
+            top_node->get_next_node(original_value) != nullptr) {
             if (attempt_solve(original_value)) {
                 return true;
             };
         }
     }
-    board.set(coord, original_value);
+    
+    board.set(coords, original_value);
     return false;
 }
 
-bool Solver::solve(Board& board) {
-    std::unordered_set<std::string> added_words;
-    for (const std::unordered_map<Coordinate, std::string>& wordlist : {board.across_words, board.down_words}) {
-        for (auto it = wordlist.begin(); it != wordlist.end(); it++) {
-            std::string word = it->second;
-            int length = (int)word.length();
-            if (!strutil::contains(word, BLANK) && !fixedtrie_array[length - WORD_MIN]->contains(word)) {
-                added_words.insert(word);
-                fixedtrie_array[length - WORD_MIN]->add(word);
-            }
-        }
-    }
-    Matrix<NodeBookmark> DP(board.rows, board.columns);
-    for (int row = 0; row < board.rows; row++) {
-        for (int col = 0; col < board.columns; col++) {
-            Coordinate coord({row, col});
-            NodeBookmark bookmark;
-            bookmark.across = nullptr;
-            bookmark.down = nullptr;
-            auto across_word_it = board.across_words.find(coord);
-            bookmark.across_word_length = (across_word_it == board.across_words.end()) ? 0 : (int)across_word_it->second.length();
-            auto down_word_it = board.down_words.find(coord);
-            bookmark.down_word_length = (down_word_it == board.down_words.end()) ? 0 : (int)down_word_it->second.length();
-            DP.set(coord, bookmark);
-        }
-    }
+
+
+std::string Solver::solve(std::string board_string, std::string wordbank_filename) {
+    Board board(board_string);
+    BoardTries boardtries(board, wordbank_filename);
     
-    bool result = recur({0, 0}, board, DP);
-    return result;
+    Matrix<CachedNodes> node_cache(board.rows, board.columns);
+    node_cache.fill({nullptr, nullptr});
+    recur({0, 0}, board, boardtries, node_cache);
+    return board.to_string();
+    
 }
