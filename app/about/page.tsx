@@ -13,7 +13,7 @@ export default function Page() {
                 <hr />
                 <h2>Credits</h2>
                 <p>
-                    This app is heavily influenced by the <a href="https://www.nytimes.com/crosswords/game/mini">NYT Mini Crossword.</a>
+                    This app is inspired by the <a href="https://www.nytimes.com/crosswords/game/mini">NYT Mini Crossword.</a>
                     <br />
                     All of the code for the application was written by yours truly. If you&apos;d like to view the source yourself, visit <a href="https://github.com/begilbert-sys/make-your-own-crossy"> my github.</a>
                 </p>
